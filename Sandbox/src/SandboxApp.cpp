@@ -1,8 +1,8 @@
-#include "Hazel.h"
+#include "Halo.h"
 
 #include "imgui/imgui.h"
 
-class ExampleLayer : public Hazel::Layer
+class ExampleLayer : public Halo::Layer
 {
 public:
 	ExampleLayer()
@@ -12,8 +12,8 @@ public:
 
 	void OnUpdate() override
 	{
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_TAB))
-			HZ_TRACE("Tab key is pressed (poll)!");
+		if (Halo::Input::IsKeyPressed(HL_KEY_TAB))
+			HL_TRACE("Tab key is pressed (poll)!");
 	}
 
 	virtual void OnImGuiRender() override
@@ -23,20 +23,20 @@ public:
 		ImGui::End();
 	}
 
-	void OnEvent(Hazel::Event& event) override
+	void OnEvent(Halo::Event& event) override
 	{
-		if (event.GetEventType() == Hazel::EventType::KeyPressed)
+		if (event.GetEventType() == Halo::EventType::KeyPressed)
 		{
-			Hazel::KeyPressedEvent& e = (Hazel::KeyPressedEvent&)event;
-			if (e.GetKeyCode() == HZ_KEY_TAB)
-				HZ_TRACE("Tab key is pressed (event)!");
-			HZ_TRACE("{0}", (char)e.GetKeyCode());
+			Halo::KeyPressedEvent& e = (Halo::KeyPressedEvent&)event;
+			if (e.GetKeyCode() == HL_KEY_TAB)
+				HL_TRACE("Tab key is pressed (event)!");
+			HL_TRACE("{0}", (char)e.GetKeyCode());
 		}
 	}
 
 };
 
-class SandBox : public Hazel::Application
+class SandBox : public Halo::Application
 {
 public:
 	SandBox()
@@ -51,7 +51,7 @@ public:
 
 };
 
-Hazel::Application* Hazel::CreateApplication()
+Halo::Application* Halo::CreateApplication()
 {
 	return new SandBox();
 }

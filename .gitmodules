@@ -1,12 +1,13 @@
-[submodule "Hazel/vendor/spdlog"]
-	path = Hazel/vendor/spdlog
+[submodule "Halo/vendor/spdlog"]
+	path = Halo/vendor/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "Hazel/vendor/GLFW"]
-	path = Hazel/vendor/GLFW
+[submodule "Halo/vendor/GLFW"]
+	path = Halo/vendor/GLFW
 	url = https://github.com/TheCherno/glfw
-[submodule "Hazel/vendor/imgui"]
-	path = Hazel/vendor/imgui
-	url = https://github.com/TheCherno/imgui
-[submodule "Hazel/vendor/glm"]
-	path = Hazel/vendor/glm
+[submodule "Halo/vendor/glm"]
+	path = Halo/vendor/glm
 	url = https://github.com/g-truc/glm
+	
+[submodule "Halo/vendor/imgui"]
+	path = Halo/vendor/imgui
+	url = https://github.com/TheCherno/imgui

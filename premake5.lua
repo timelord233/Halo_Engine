@@ -1,4 +1,4 @@
-workspace "Hazel"
+workspace "Halo"
 	architecture "x64"
 	configurations
 	{
@@ -9,17 +9,17 @@ workspace "Hazel"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
-IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
-IncludeDir["ImGui"] = "Hazel/vendor/imgui"
-IncludeDir["glm"] = "Hazel/vendor/glm"
+IncludeDir["GLFW"] = "Halo/vendor/GLFW/include"
+IncludeDir["Glad"] = "Halo/vendor/Glad/include"
+IncludeDir["ImGui"] = "Halo/vendor/imgui"
+IncludeDir["glm"] = "Halo/vendor/glm"
 
-include "Hazel/vendor/GLFW"
-include "Hazel/vendor/Glad"
-include "Hazel/vendor/imgui"
+include "Halo/vendor/GLFW"
+include "Halo/vendor/Glad"
+include "Halo/vendor/imgui"
 
-project "Hazel"
-	location "Hazel"
+project "Halo"
+	location "Halo"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
@@ -27,8 +27,8 @@ project "Hazel"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("Intermediate/" .. outputdir .. "/%{prj.name}")
-	pchheader "hzpch.h"
-	pchsource "Hazel/src/hzpch.cpp"
+	pchheader "hlpch.h"
+	pchsource "Halo/src/hlpch.cpp"
 	files
 	{
 		"%{prj.name}/src/**.h",
@@ -62,23 +62,23 @@ project "Hazel"
 		systemversion "latest"
 		defines
 		{
-			"HZ_PLATFORM_WINDOWS",
-			"HZ_BUILD_DLL",
+			"HL_PLATFORM_WINDOWS",
+			"HL_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
 
 	filter "configurations:Debug"
-		defines "HZ_DEBUG"
+		defines "HL_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "HZ_RELEASE"
+		defines "HL_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "HZ_DIST"
+		defines "HL_DIST"
 		runtime "Release"
 		optimize "on"
 
@@ -98,34 +98,34 @@ project "Sandbox"
 	}
 	includedirs
 	{
-		"Hazel/vendor/spdlog/include",
-		"Hazel/src",
-		"Hazel/vendor",
+		"Halo/vendor/spdlog/include",
+		"Halo/src",
+		"Halo/vendor",
 		"%{IncludeDir.glm}"
 	}
 	links
 	{
-		"Hazel"
+		"Halo"
 	}
 	filter "system:windows"
 		cppdialect "C++17"
 		systemversion "latest"
 		defines
 		{
-			"HZ_PLATFORM_WINDOWS"
+			"HL_PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"
-		defines "HZ_DEBUG"
+		defines "HL_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
-		defines "HZ_RELEASE"
+		defines "HL_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
-		defines "HZ_DIST"
+		defines "HL_DIST"
 		runtime "Release"
 		optimize "on"
