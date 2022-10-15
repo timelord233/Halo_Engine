@@ -3,34 +3,13 @@
 #include "Halo/Log.h"
 #include "Halo/Input.h"
 
-#include <glad/glad.h>
+#include "Halo/Renderer/Renderer.h"
 
 namespace Halo {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
-
-	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
-	{
-		switch (type)
-		{
-		case Halo::ShaderDataType::Float:    return GL_FLOAT;
-		case Halo::ShaderDataType::Float2:   return GL_FLOAT;
-		case Halo::ShaderDataType::Float3:   return GL_FLOAT;
-		case Halo::ShaderDataType::Float4:   return GL_FLOAT;
-		case Halo::ShaderDataType::Mat3:     return GL_FLOAT;
-		case Halo::ShaderDataType::Mat4:     return GL_FLOAT;
-		case Halo::ShaderDataType::Int:      return GL_INT;
-		case Halo::ShaderDataType::Int2:     return GL_INT;
-		case Halo::ShaderDataType::Int3:     return GL_INT;
-		case Halo::ShaderDataType::Int4:     return GL_INT;
-		case Halo::ShaderDataType::Bool:     return GL_BOOL;
-		}
-
-		HL_CORE_ASSERT(false, "Unknown ShaderDataType!");
-		return 0;
-	}
 
 	Application::Application()
 	{
@@ -150,16 +129,18 @@ namespace Halo {
 	{
 		while (m_Running)
 		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+			RenderCommand::Clear();
+
+			Renderer::BeginScene();
 
 			m_BlueShader->Bind();
-			m_SquareVA->Bind();
-			glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+			Renderer::Submit(m_SquareVA);
 
 			m_Shader->Bind();
-			m_VertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+			Renderer::Submit(m_VertexArray);
+
+			Renderer::EndScene();
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
