@@ -1350,6 +1350,8 @@
     <ClInclude Include="src\Halo\Renderer\Buffer.h" />
     <ClInclude Include="src\Halo\Renderer\Renderer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
+    <ClInclude Include="src\Halo\Renderer\VertexArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Halo\Application.cpp">
@@ -1384,5 +1386,7 @@
     <ClCompile Include="src\Halo\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Halo\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
+    <ClCompile Include="src\Halo\Renderer\VertexArray.cpp" />
   </ItemGroup>
 </Project>
