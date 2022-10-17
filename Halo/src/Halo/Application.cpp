@@ -129,19 +129,6 @@ namespace Halo {
 	{
 		while (m_Running)
 		{
-			RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-			RenderCommand::Clear();
-
-			Renderer::BeginScene();
-
-			//m_BlueShader->Bind();
-			//Renderer::Submit(m_SquareVA);
-
-			//m_Shader->Bind();
-			//Renderer::Submit(m_VertexArray);
-
-			Renderer::EndScene();
-
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
 
