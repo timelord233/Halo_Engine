@@ -13,3 +13,11 @@
 // ---Entry Point------------
 #include "Halo/EntryPoint.h"
 //---------------------------
+
+// ---Renderer API-----------
+#include "Halo/Renderer/Renderer.h"
+#include "Halo/Renderer/Buffer.h"
+#include "Halo/Renderer/Shader.h"
+#include "Halo/Renderer/Mesh.h"
+#include "Halo/Renderer/Camera.h"
+//----------------------------

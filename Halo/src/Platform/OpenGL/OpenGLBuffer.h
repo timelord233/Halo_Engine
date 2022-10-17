@@ -7,7 +7,7 @@ namespace Halo {
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
-		OpenGLVertexBuffer(float* vertices, uint32_t size);
+		OpenGLVertexBuffer(void* vertices, uint32_t size);
 		virtual ~OpenGLVertexBuffer();
 
 		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
@@ -23,7 +23,7 @@ namespace Halo {
 	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
-		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
+		OpenGLIndexBuffer(void* indices, uint32_t count);
 		virtual ~OpenGLIndexBuffer();
 
 		virtual void Bind() const;

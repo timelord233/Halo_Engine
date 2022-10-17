@@ -49,7 +49,8 @@ project "Halo"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{prj.name}/vendor/assimp/include"
 	}
 	links 
 	{ 
@@ -105,7 +106,8 @@ project "Sandbox"
 	}
 	links
 	{
-		"Halo"
+		"Halo",
+		"Halo/vendor/assimp/win64/assimp.lib"
 	}
 	filter "system:windows"
 		cppdialect "C++17"

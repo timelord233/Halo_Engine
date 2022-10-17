@@ -41,7 +41,7 @@ namespace Halo {
 		
 		uint32_t indices[3] = { 0, 1, 2 };
 		std::shared_ptr<IndexBuffer> indexBuffer;
-		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 		std::string vertexSrc = R"(
@@ -91,7 +91,7 @@ namespace Halo {
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
 		std::shared_ptr<IndexBuffer> squareIB;
-		squareIB.reset(IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		squareIB.reset(IndexBuffer::Create(squareIndices, sizeof(squareIndices)));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
 		std::string blueShaderVertexSrc = R"(
@@ -134,11 +134,11 @@ namespace Halo {
 
 			Renderer::BeginScene();
 
-			m_BlueShader->Bind();
-			Renderer::Submit(m_SquareVA);
+			//m_BlueShader->Bind();
+			//Renderer::Submit(m_SquareVA);
 
-			m_Shader->Bind();
-			Renderer::Submit(m_VertexArray);
+			//m_Shader->Bind();
+			//Renderer::Submit(m_VertexArray);
 
 			Renderer::EndScene();
 

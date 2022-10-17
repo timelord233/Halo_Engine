@@ -7,7 +7,7 @@
 
 namespace Halo {
 
-	VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t size)
+	VertexBuffer* VertexBuffer::Create(void* vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -19,7 +19,7 @@ namespace Halo {
 		return nullptr;
 	}
 
-	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t size)
+	IndexBuffer* IndexBuffer::Create(void* indices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{

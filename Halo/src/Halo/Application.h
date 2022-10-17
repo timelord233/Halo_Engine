@@ -39,6 +39,8 @@ namespace Halo {
 
 		std::shared_ptr<Shader> m_BlueShader;
 		std::shared_ptr<VertexArray> m_SquareVA;
+
+
 	};
 
 	//To be define in CLIENT
