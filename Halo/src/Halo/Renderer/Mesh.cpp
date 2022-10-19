@@ -51,9 +51,11 @@ namespace Halo {
 		Assimp::Importer importer;
 
 		const aiScene* scene = importer.ReadFile(filename, ImportFlags);
-		if (!scene || !scene->HasMeshes())
+		if (!scene || !scene->HasMeshes()) {
 			HL_CORE_ERROR("Failed to load mesh file: {0}", filename);
-
+			return;
+		}
+			
 		aiMesh* mesh = scene->mMeshes[0];
 
 		HL_CORE_ASSERT(mesh->HasPositions(), "Meshes require positions.");

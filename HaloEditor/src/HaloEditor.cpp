@@ -17,8 +17,8 @@ public:
 	void OnAttach() override 
 	{
 		using namespace Halo;
-		m_Mesh.reset(new Mesh("assets/meshes/african_head.obj"));
-		m_Texture.reset(Texture2D::Create("assets/textures/african_head_diffuse.tga"));
+		m_Mesh.reset(new Mesh("assets/meshes/cerberus.fbx"));
+		m_Texture.reset(Texture2D::Create("assets/textures/cerberus/cerberus_A.png",true));
 		std::string vertexSrc = R"(
 			#version 430
 
@@ -135,15 +135,15 @@ private:
 	Halo::Camera m_Camera;
 };
 
-class SandBox : public Halo::Application
+class HaloEditor : public Halo::Application
 {
 public:
-	SandBox()
+	HaloEditor()
 	{
 		PushLayer(new EditorLayer());
 	}
 
-	~SandBox()
+	~HaloEditor()
 	{
 
 	}
@@ -152,5 +152,5 @@ public:
 
 Halo::Application* Halo::CreateApplication()
 {
-	return new SandBox();
+	return new HaloEditor();
 }

@@ -19,7 +19,7 @@ namespace Halo {
 
 		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
 		{
-			s_RendererAPI->DrawIndexed(vertexArray);
+			s_RendererAPI->DrawIndexed(vertexArray,true);
 		}
 	private:
 		static RendererAPI* s_RendererAPI;
