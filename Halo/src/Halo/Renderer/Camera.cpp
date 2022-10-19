@@ -19,7 +19,7 @@ namespace Halo {
 		m_RotationSpeed = 0.002f;
 		m_ZoomSpeed = 0.2f;
 
-		m_Position = { -100, 100, 100 };
+		m_Position = { -10, 10, 10 };
 		m_Rotation = glm::vec3(90.0f, 0.0f, 0.0f);
 
 		m_FocalPoint = glm::vec3(0.0f);

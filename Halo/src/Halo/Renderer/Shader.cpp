@@ -139,4 +139,14 @@ namespace Halo {
 		else
 			HL_CORE_WARN("Uniform '{0}' not found!", name);
 	}
+
+	void Shader::UploadUniformFloat3(const std::string& name, const glm::vec3& values)
+	{
+		glUseProgram(m_RendererID);
+		auto location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location != -1)
+			glUniform3f(location, values.x, values.y, values.z);
+		else
+			HL_CORE_WARN("Uniform '{0}' not found!", name);
+	}
 }
