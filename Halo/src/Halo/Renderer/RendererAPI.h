@@ -6,6 +6,18 @@
 
 namespace Halo {
 
+	using RendererID = uint32_t;
+
+	struct RenderAPICapabilities
+	{
+		std::string Vendor;
+		std::string Renderer;
+		std::string Version;
+
+		int MaxSamples;
+		float MaxAnisotropy;
+	};
+
 	class RendererAPI
 	{
 	public:
@@ -18,6 +30,12 @@ namespace Halo {
 		virtual void Clear() = 0;
 
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) = 0;
+
+		static RenderAPICapabilities& GetCapabilities()
+		{
+			static RenderAPICapabilities capabilities;
+			return capabilities;
+		}
 
 		inline static API GetAPI() { return s_API; }
 	private:

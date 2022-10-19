@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include "Halo/Renderer/RendererAPI.h"
+
 namespace Halo {
 
 	OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
@@ -21,6 +23,15 @@ namespace Halo {
 		HL_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
 		HL_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
 		HL_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
+
+		auto& caps = RendererAPI::GetCapabilities();
+
+		caps.Vendor = (const char*)glGetString(GL_VENDOR);
+		caps.Renderer = (const char*)glGetString(GL_RENDERER);
+		caps.Version = (const char*)glGetString(GL_VERSION);
+
+		glGetIntegerv(GL_MAX_SAMPLES, &caps.MaxSamples);
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &caps.MaxAnisotropy);
 	}
 
 	void OpenGLContext::SwapBuffers()

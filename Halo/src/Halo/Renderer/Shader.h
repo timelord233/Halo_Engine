@@ -15,6 +15,7 @@ namespace Halo {
 		void UnBind();
 
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+		void UploadUniformInt(const std::string& name, int value);
 	private:
 		uint32_t m_RendererID;
 	};

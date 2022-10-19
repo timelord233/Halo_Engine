@@ -20,4 +20,5 @@
 #include "Halo/Renderer/Shader.h"
 #include "Halo/Renderer/Mesh.h"
 #include "Halo/Renderer/Camera.h"
+#include "Halo/Renderer/Texture.h"
 //----------------------------

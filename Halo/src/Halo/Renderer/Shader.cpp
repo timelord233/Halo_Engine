@@ -130,4 +130,13 @@ namespace Halo {
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
+	void Shader::UploadUniformInt(const std::string& name, int value)
+	{
+		glUseProgram(m_RendererID);
+		auto location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location != -1)
+			glUniform1i(location, value);
+		else
+			HL_CORE_WARN("Uniform '{0}' not found!", name);
+	}
 }

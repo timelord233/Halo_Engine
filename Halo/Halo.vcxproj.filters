@@ -117,6 +117,9 @@
     <ClInclude Include="src\Halo\Renderer\Shader.h">
       <Filter>src\Halo\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Halo\Renderer\Texture.h">
+      <Filter>src\Halo\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Halo\Renderer\VertexArray.h">
       <Filter>src\Halo\Renderer</Filter>
     </ClInclude>
@@ -130,6 +133,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
@@ -1430,6 +1436,9 @@
     <ClCompile Include="src\Halo\Renderer\Shader.cpp">
       <Filter>src\Halo\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Halo\Renderer\Texture.cpp">
+      <Filter>src\Halo\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Halo\Renderer\VertexArray.cpp">
       <Filter>src\Halo\Renderer</Filter>
     </ClCompile>
@@ -1440,6 +1449,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp">
@@ -1454,5 +1466,6 @@
     <ClCompile Include="src\hlpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Halo\Vendor\stb_image.cpp" />
   </ItemGroup>
 </Project>

@@ -50,7 +50,8 @@ project "Halo"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{prj.name}/vendor/assimp/include"
+		"%{prj.name}/vendor/assimp/include",
+		"%{prj.name}/vendor/stb/include"
 	}
 	links 
 	{ 
