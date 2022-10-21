@@ -4,7 +4,7 @@
 #include "spdlog/fmt/ostr.h"
 
 namespace Halo {
-	class Halo_API Log
+	class HALO_API Log
 	{
 	public:
 		static void Init();

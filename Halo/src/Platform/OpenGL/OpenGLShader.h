@@ -16,6 +16,8 @@ namespace Halo {
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
+		virtual void UploadUniformBuffer(const UniformBufferBase& uniformBuffer) override;
+		
 		void UploadUniformInt(const std::string& name, int value);
 
 		void UploadUniformFloat(const std::string& name, float value);

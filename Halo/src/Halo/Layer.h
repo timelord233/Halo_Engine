@@ -5,7 +5,7 @@
 
 namespace Halo {
 
-	class Halo_API Layer
+	class HALO_API Layer
 	{
 	public:
 		Layer(const std::string& name = "Layer");

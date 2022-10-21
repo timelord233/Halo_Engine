@@ -4,7 +4,7 @@
 
 namespace Halo {
 
-	class Halo_API WindowResizeEvent : public Event
+	class HALO_API WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -26,7 +26,7 @@ namespace Halo {
 		unsigned int m_Width, m_Height;
 	};
 
-	class Halo_API WindowCloseEvent : public Event
+	class HALO_API WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() {}
@@ -35,7 +35,7 @@ namespace Halo {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class Halo_API AppTickEvent : public Event
+	class HALO_API AppTickEvent : public Event
 	{
 	public:
 		AppTickEvent() {}
@@ -44,7 +44,7 @@ namespace Halo {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class Halo_API AppUpdateEvent : public Event
+	class HALO_API AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() {}
@@ -53,7 +53,7 @@ namespace Halo {
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class Halo_API AppRenderEvent : public Event
+	class HALO_API AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() {}

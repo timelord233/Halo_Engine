@@ -7,7 +7,7 @@
 
 namespace Halo {
 
-	class Halo_API ImGuiLayer : public Layer
+	class HALO_API ImGuiLayer : public Layer
 	{
 	public:
 		ImGuiLayer();

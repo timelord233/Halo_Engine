@@ -4,7 +4,7 @@
 
 namespace Halo {
 
-	class Halo_API Input
+	class HALO_API Input
 	{
 	public:
 		inline static bool IsKeyPressed(int keycode) { return s_Instance->IsKeyPressedImpl(keycode); }

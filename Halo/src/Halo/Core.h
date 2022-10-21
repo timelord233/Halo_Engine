@@ -3,12 +3,12 @@
 #ifdef HL_PLATFORM_WINDOWS
 #if HL_DYNAMIC_LINK
 	#ifdef HL_BUILD_DLL
-		#define Halo_API __declspec(dllexport)
+		#define HALO_API __declspec(dllexport)
 	#else
-		#define Halo_API __declspec(dllimport)
+		#define HALO_API __declspec(dllimport)
 	#endif
 #else
-	#define Halo_API
+	#define HALO_API
 #endif
 #else
 	#error Halo only support Windows!

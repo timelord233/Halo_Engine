@@ -10,7 +10,7 @@
 #include "Halo/Renderer/VertexArray.h"
 
 namespace Halo {
-	class Halo_API Application
+	class HALO_API Application
 	{
 	public:
 		Application();

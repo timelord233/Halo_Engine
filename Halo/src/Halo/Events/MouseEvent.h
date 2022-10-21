@@ -4,7 +4,7 @@
 
 namespace Halo {
 
-	class Halo_API MouseMovedEvent : public Event
+	class HALO_API MouseMovedEvent : public Event
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -26,7 +26,7 @@ namespace Halo {
 		float m_MouseX, m_MouseY;
 	};
 
-	class Halo_API MouseScrolledEvent : public Event
+	class HALO_API MouseScrolledEvent : public Event
 	{
 	public:
 		MouseScrolledEvent(float xOffset, float yOffset)
@@ -48,7 +48,7 @@ namespace Halo {
 		float m_XOffset, m_YOffset;
 	};
 
-	class Halo_API MouseButtonEvent : public Event
+	class HALO_API MouseButtonEvent : public Event
 	{
 	public:
 		inline int GetMouseButton() const { return m_Button; }
@@ -61,7 +61,7 @@ namespace Halo {
 		int m_Button;
 	};
 
-	class Halo_API MouseButtonPressedEvent : public MouseButtonEvent
+	class HALO_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)
@@ -77,7 +77,7 @@ namespace Halo {
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class Halo_API MouseButtonReleasedEvent : public MouseButtonEvent
+	class HALO_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(int button)

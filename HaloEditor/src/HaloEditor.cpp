@@ -67,10 +67,12 @@ public:
 		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
 
 		m_Shader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformMat4("u_viewProjection", viewProjection);
-		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformFloat3("u_lightPos", m_LightPos);
-		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformFloat3("u_viewPos", m_Camera.GetPosition());
-		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformInt("u_baseColor", 1);
+		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 2 + sizeof(int), 4> phongShaderUB;
+		phongShaderUB.Push("u_viewProjection", viewProjection);
+		phongShaderUB.Push("u_lightPos", m_LightPos);
+		phongShaderUB.Push("u_viewPos", m_Camera.GetPosition());
+		phongShaderUB.Push("u_baseColor", 1);
+		m_Shader->UploadUniformBuffer(phongShaderUB);
 		m_Texture->Bind(1);
 		m_Mesh->Render();
 

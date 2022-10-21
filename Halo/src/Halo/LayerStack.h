@@ -7,7 +7,7 @@
 
 namespace Halo {
 
-	class Halo_API LayerStack
+	class HALO_API LayerStack
 	{
 	public:
 		LayerStack();

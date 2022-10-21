@@ -199,4 +199,45 @@ namespace Halo {
 			glDetachShader(program, id);
 	}
 
+	void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
+	{
+		for (unsigned int i = 0; i < uniformBuffer.GetUniformCount(); i++)
+		{
+			const UniformDecl& decl = uniformBuffer.GetUniforms()[i];
+			switch (decl.Type)
+			{
+			case UniformType::Int32:
+			{
+				const std::string& name = decl.Name;
+				int value = *(int*)(uniformBuffer.GetBuffer() + decl.Offset);
+				UploadUniformInt(name, value);
+			}
+			case UniformType::Float:
+			{
+				const std::string& name = decl.Name;
+				float value = *(float*)(uniformBuffer.GetBuffer() + decl.Offset);
+				UploadUniformFloat(name, value);
+			}
+			case UniformType::Float3:
+			{
+				const std::string& name = decl.Name;
+				glm::vec3& values = *(glm::vec3*)(uniformBuffer.GetBuffer() + decl.Offset);
+				UploadUniformFloat3(name, values);
+			}
+			case UniformType::Float4:
+			{
+				const std::string& name = decl.Name;
+				glm::vec4& values = *(glm::vec4*)(uniformBuffer.GetBuffer() + decl.Offset);
+				UploadUniformFloat4(name, values);
+			}
+			case UniformType::Matrix4x4:
+			{
+				const std::string& name = decl.Name;
+				glm::mat4& values = *(glm::mat4*)(uniformBuffer.GetBuffer() + decl.Offset);
+				UploadUniformMat4(name, values);
+			}
+			}
+		}
+	}
+
 }

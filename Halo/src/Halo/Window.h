@@ -22,7 +22,7 @@ namespace Halo {
 	};
 
 	// Interface representing a desktop system based Window
-	class Halo_API Window
+	class HALO_API Window
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;

@@ -4,7 +4,7 @@
 
 namespace Halo {
 
-	class Halo_API KeyEvent : public Event
+	class HALO_API KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
@@ -17,7 +17,7 @@ namespace Halo {
 		int m_KeyCode;
 	};
 
-	class Halo_API KeyPressedEvent : public KeyEvent
+	class HALO_API KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keycode, int repeatCount)
@@ -37,7 +37,7 @@ namespace Halo {
 		int m_RepeatCount;
 	};
 
-	class Halo_API KeyReleasedEvent : public KeyEvent
+	class HALO_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keycode)
@@ -53,7 +53,7 @@ namespace Halo {
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
-	class Halo_API KeyTypedEvent : public KeyEvent
+	class HALO_API KeyTypedEvent : public KeyEvent
 	{
 	public:
 		KeyTypedEvent(int keycode)
