@@ -5,6 +5,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Platform/OpenGL/OpenGLShader.h"
+
 class EditorLayer : public Halo::Layer
 {
 public:
@@ -19,92 +21,8 @@ public:
 		using namespace Halo;
 		m_Mesh.reset(new Mesh("assets/meshes/cerberus.fbx"));
 		m_Texture.reset(Texture2D::Create("assets/textures/cerberus/cerberus_A.png",false));
-
-		std::string lightVSrc = R"(
-			#version 430
-			layout(location = 0) in vec3 a_Position;
-			
-			uniform mat4 u_viewProjection;
-			uniform mat4 u_model;
-			out vec3 v_pos;
-
-			void main()
-			{
-				gl_Position =  u_viewProjection * u_model * vec4(a_Position, 1.0);
-				v_pos = a_Position;
-			}
-		)";
-		std::string lightFSrc = R"(
-			#version 430
-
-			layout(location = 0) out vec4 finalColor;
-
-			void main()
-			{
-				finalColor = vec4(1.0);
-			}
-		)";
-		std::string vertexSrc = R"(
-			#version 430
-
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec3 a_Normal;
-			layout(location = 2) in vec3 a_Tangent;
-			layout(location = 3) in vec3 a_Bitangent;
-			layout(location = 4) in vec2 a_TexCoord;
-
-			uniform mat4 u_viewProjection;
-
-			out vec3 v_Normal;
-			out vec2 v_TexCoord;
-			out vec3 v_Position;
-
-			void main()
-			{
-				gl_Position =  u_viewProjection * vec4(a_Position, 1.0);
-				v_Normal = a_Normal;
-				v_TexCoord = a_TexCoord;
-				v_Position = a_Position;
-			}
-		)";
-		std::string fragmentSrc = R"(
-			#version 430
-
-			layout(location = 0) out vec4 finalColor;
-
-			in vec3 v_Normal;	
-			in vec2 v_TexCoord;
-			in vec3 v_Position;
-
-			uniform vec3 u_lightPos;
-			uniform vec3 u_viewPos;
-			uniform sampler2D u_baseColor;
-
-			void main()
-			{
-				vec3 lightColor = vec3(1.0,1.0,1.0);
-				float ambientStrength = 0.1;
-				vec3 ambient = ambientStrength * lightColor;
-  	
-				// diffuse 
-				vec3 norm = normalize(v_Normal);
-				vec3 lightDir = normalize(u_lightPos - v_Position);
-				float diff = max(dot(norm, lightDir), 0.0);
-				vec3 diffuse = diff * lightColor;
-
-				// specular
-				float specularStrength = 0.5;
-				vec3 viewDir = normalize(u_viewPos - v_Position);
-				vec3 reflectDir = reflect(-lightDir, norm);  
-				float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-				vec3 specular = specularStrength * spec * lightColor;  
-            
-				finalColor = vec4((ambient + diffuse + specular),1.0) * texture(u_baseColor,v_TexCoord);
-			}
-		)";
-
-		m_Shader.reset(new Halo::Shader(vertexSrc, fragmentSrc));
-		m_LightShader.reset(new Halo::Shader(lightVSrc, lightFSrc));
+		m_Shader.reset(Shader::Create("assets/shaders/shader.glsl"));
+		m_LightShader.reset(Shader::Create("assets/shaders/lightCubeShader.glsl"));
 		m_VertexArray.reset(VertexArray::Create());
 
 		float vertices[] = {
@@ -149,16 +67,16 @@ public:
 		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
 
 		m_Shader->Bind();
-		m_Shader->UploadUniformMat4("u_viewProjection", viewProjection);
-		m_Shader->UploadUniformFloat3("u_lightPos", m_LightPos);
-		m_Shader->UploadUniformFloat3("u_viewPos", m_Camera.GetPosition());
-		m_Shader->UploadUniformInt("u_baseColor", 1);
+		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformMat4("u_viewProjection", viewProjection);
+		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformFloat3("u_lightPos", m_LightPos);
+		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformFloat3("u_viewPos", m_Camera.GetPosition());
+		std::dynamic_pointer_cast<OpenGLShader>(m_Shader)->UploadUniformInt("u_baseColor", 1);
 		m_Texture->Bind(1);
 		m_Mesh->Render();
 
 		m_LightShader->Bind();
-		m_LightShader->UploadUniformMat4("u_viewProjection", viewProjection);
-		m_LightShader->UploadUniformMat4("u_model", model);
+		std::dynamic_pointer_cast<OpenGLShader>(m_LightShader)->UploadUniformMat4("u_viewProjection", viewProjection);
+		std::dynamic_pointer_cast<OpenGLShader>(m_LightShader)->UploadUniformMat4("u_model", model);
 		Renderer::Submit(m_VertexArray);
 
 		Renderer::EndScene();
@@ -187,11 +105,11 @@ public:
 		}
 	}
 private:
-	std::unique_ptr<Halo::Mesh> m_Mesh;
-	std::unique_ptr<Halo::Shader> m_Shader;
-	std::unique_ptr<Halo::Shader> m_LightShader;
+	std::shared_ptr<Halo::Mesh> m_Mesh;
+	std::shared_ptr<Halo::Shader> m_Shader;
+	std::shared_ptr<Halo::Shader> m_LightShader;
 	std::shared_ptr<Halo::VertexArray> m_VertexArray;
-	std::unique_ptr<Halo::Texture2D> m_Texture;
+	std::shared_ptr<Halo::Texture2D> m_Texture;
 
 	struct Light
 	{

@@ -103,7 +103,8 @@ project "HaloEditor"
 		"Halo/vendor/spdlog/include",
 		"Halo/src",
 		"Halo/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.Glad}"
 	}
 	links
 	{
