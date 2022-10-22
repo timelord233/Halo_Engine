@@ -4,3 +4,5 @@ E:\Hazel\Halo\vendor\Glad\bin\Debug-windows-x86_64\Glad\Glad.pdb
 E:\Hazel\Halo\vendor\Glad\bin-int\Debug-windows-x86_64\Glad\Glad.pdb
 E:\HaloEngine\Halo\vendor\Glad\bin\Debug-windows-x86_64\Glad\Glad.pdb
 E:\HaloEngine\Halo\vendor\Glad\bin-int\Debug-windows-x86_64\Glad\Glad.pdb
+E:\HaloEngine\Halo\Thirdparty\Glad\bin\Debug-windows-x86_64\Glad\Glad.pdb
+E:\HaloEngine\Halo\Thirdparty\Glad\bin-int\Debug-windows-x86_64\Glad\Glad.pdb

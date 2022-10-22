@@ -1,13 +1,13 @@
-[submodule "Halo/vendor/spdlog"]
-	path = Halo/vendor/spdlog
+[submodule "Halo/Thirdparty/spdlog"]
+	path = Halo/Thirdparty/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "Halo/vendor/GLFW"]
-	path = Halo/vendor/GLFW
+[submodule "Halo/Thirdparty/GLFW"]
+	path = Halo/Thirdparty/GLFW
 	url = https://github.com/TheCherno/glfw
-[submodule "Halo/vendor/glm"]
-	path = Halo/vendor/glm
+[submodule "Halo/Thirdparty/glm"]
+	path = Halo/Thirdparty/glm
 	url = https://github.com/g-truc/glm
 	
-[submodule "Halo/vendor/imgui"]
-	path = Halo/vendor/imgui
+[submodule "Halo/Thirdparty/imgui"]
+	path = Halo/Thirdparty/imgui
 	url = https://github.com/TheCherno/imgui

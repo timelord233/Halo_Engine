@@ -23,6 +23,7 @@ public:
 		m_Texture.reset(Texture2D::Create("assets/textures/cerberus/cerberus_A.png",false));
 		m_Shader.reset(Shader::Create("assets/shaders/shader.glsl"));
 		m_LightShader.reset(Shader::Create("assets/shaders/lightCubeShader.glsl"));
+		m_pbrShader.reset(Shader::Create("assets/shaders/pbrShader.glsl"));
 		m_VertexArray.reset(VertexArray::Create());
 
 		float vertices[] = {
@@ -74,6 +75,17 @@ public:
 		phongShaderUB.Push("u_baseColor", 1);
 		m_Shader->UploadUniformBuffer(phongShaderUB);
 		m_Texture->Bind(1);
+
+		m_pbrShader->Bind();
+		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 3 + sizeof(float) * 3, 7> pbrShaderUB;
+		pbrShaderUB.Push("u_viewProjection", viewProjection);
+		pbrShaderUB.Push("u_lightPos", m_LightPos);
+		pbrShaderUB.Push("u_viewPos", m_Camera.GetPosition());
+		pbrShaderUB.Push("albedo", m_AlbedoInput.Color);
+		pbrShaderUB.Push("metallic", m_MetalnessInput.Value);
+		pbrShaderUB.Push("roughness", m_RoughnessInput.Value);
+		pbrShaderUB.Push("ao", 1.0f);
+		m_pbrShader->UploadUniformBuffer(pbrShaderUB);
 		m_Mesh->Render();
 
 		m_LightShader->Bind();
@@ -88,12 +100,20 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
+
 		ImGui::Begin("Test");
 		auto cameraPosition = m_Camera.GetPosition();
 		ImGui::Text("Camera Position: %.2f, %.2f, %.2f", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 		auto cameraForward = m_Camera.GetForwardDirection();
 		ImGui::Text("Camera Forward: %.2f, %.2f, %.2f", cameraForward.x, cameraForward.y, cameraForward.z);
 		ImGui::End();
+
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit3("albedo", glm::value_ptr(m_AlbedoInput.Color));
+		ImGui::SliderFloat("metallic", &m_MetalnessInput.Value, 0.0f, 1.0f);
+		ImGui::SliderFloat("roughness", &m_RoughnessInput.Value, 0.0f, 1.0f);
+		ImGui::End();
+
 	}
 
 	void OnEvent(Halo::Event& event) override
@@ -110,6 +130,7 @@ private:
 	std::shared_ptr<Halo::Mesh> m_Mesh;
 	std::shared_ptr<Halo::Shader> m_Shader;
 	std::shared_ptr<Halo::Shader> m_LightShader;
+	std::shared_ptr<Halo::Shader> m_pbrShader;
 	std::shared_ptr<Halo::VertexArray> m_VertexArray;
 	std::shared_ptr<Halo::Texture2D> m_Texture;
 
@@ -120,6 +141,31 @@ private:
 	};
 	Light m_Light;
 	glm::vec3 m_LightPos;
+
+	struct AlbedoInput
+	{
+		glm::vec3 Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/Engine/Rendering/Materials/PhysicallyBased
+		std::unique_ptr<Halo::Texture2D> TextureMap;
+		bool SRGB = true;
+		bool UseTexture = false;
+	};
+	AlbedoInput m_AlbedoInput;
+
+	struct MetalnessInput
+	{
+		float Value = 1.0f;
+		std::unique_ptr<Halo::Texture2D> TextureMap;
+		bool UseTexture = false;
+	};
+	MetalnessInput m_MetalnessInput;
+
+	struct RoughnessInput
+	{
+		float Value = 0.5f;
+		std::unique_ptr<Halo::Texture2D> TextureMap;
+		bool UseTexture = false;
+	};
+	RoughnessInput m_RoughnessInput;
 
 	Halo::Camera m_Camera;
 };

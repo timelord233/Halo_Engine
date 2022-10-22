@@ -9,14 +9,14 @@ workspace "Halo"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["GLFW"] = "Halo/vendor/GLFW/include"
-IncludeDir["Glad"] = "Halo/vendor/Glad/include"
-IncludeDir["ImGui"] = "Halo/vendor/imgui"
-IncludeDir["glm"] = "Halo/vendor/glm"
+IncludeDir["GLFW"] = "Halo/Thirdparty/GLFW/include"
+IncludeDir["Glad"] = "Halo/Thirdparty/Glad/include"
+IncludeDir["ImGui"] = "Halo/Thirdparty/imgui"
+IncludeDir["glm"] = "Halo/Thirdparty/glm"
 
-include "Halo/vendor/GLFW"
-include "Halo/vendor/Glad"
-include "Halo/vendor/imgui"
+include "Halo/Thirdparty/GLFW"
+include "Halo/Thirdparty/Glad"
+include "Halo/Thirdparty/imgui"
 
 project "Halo"
 	location "Halo"
@@ -33,8 +33,8 @@ project "Halo"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/vendor/glm/glm/**.hpp",
-		"%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/Thirdparty/glm/glm/**.hpp",
+		"%{prj.name}/Thirdparty/glm/glm/**.inl",
 	}
 
 	defines
@@ -45,13 +45,13 @@ project "Halo"
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/Thirdparty/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{prj.name}/vendor/assimp/include",
-		"%{prj.name}/vendor/stb/include"
+		"%{prj.name}/Thirdparty/assimp/include",
+		"%{prj.name}/Thirdparty/stb/include"
 	}
 	links 
 	{ 
@@ -100,16 +100,16 @@ project "HaloEditor"
 	}
 	includedirs
 	{
-		"Halo/vendor/spdlog/include",
+		"Halo/Thirdparty/spdlog/include",
 		"Halo/src",
-		"Halo/vendor",
+		"Halo/Thirdparty",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.Glad}"
 	}
 	links
 	{
 		"Halo",
-		"Halo/vendor/assimp/win64/assimp.lib"
+		"Halo/Thirdparty/assimp/win64/assimp.lib"
 	}
 	filter "system:windows"
 		cppdialect "C++17"
