@@ -32,10 +32,23 @@ in vec3 v_Position;
 uniform vec3 u_lightPos;
 uniform vec3 u_viewPos;
 
-uniform vec3  albedo;
-uniform float metallic;
-uniform float roughness;
-uniform float ao;
+uniform vec3  u_AlbedoColor;
+uniform float u_Metalness;
+uniform float u_Roughness;
+uniform float u_ao;
+
+// PBR texture inputs
+uniform sampler2D u_AlbedoTexture;
+uniform sampler2D u_NormalTexture;
+uniform sampler2D u_MetalnessTexture;
+uniform sampler2D u_RoughnessTexture;
+
+// Toggles
+uniform float u_RadiancePrefilter;
+uniform float u_AlbedoTexToggle;
+uniform float u_NormalTexToggle;
+uniform float u_MetalnessTexToggle;
+uniform float u_RoughnessTexToggle;
 
 const float PI = 3.14159265359;
 // ----------------------------------------------------------------------------
@@ -81,7 +94,15 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
+    vec3 albedo = u_AlbedoTexToggle>0.5 ? texture(u_AlbedoTexture,v_TexCoord).rgb : u_AlbedoColor;
+    float metallic = u_MetalnessTexToggle > 0.5 ? texture(u_MetalnessTexture,v_TexCoord).r : u_Metalness;
+    float roughness = u_RoughnessTexToggle > 0.5 ?  texture(u_RoughnessTexture,v_TexCoord).r : u_Roughness;
     vec3 N = normalize(v_Normal);
+    if (u_NormalTexToggle > 0.5)
+	{
+		N = normalize(2.0 * texture(u_NormalTexture, v_TexCoord).rgb - 1.0);
+		N = normalize(v_Normal * N);
+	}
     vec3 V = normalize(u_viewPos - v_Position);
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
@@ -127,7 +148,7 @@ void main()
 
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 ambient = vec3(0.03) * albedo * u_ao;
 
     vec3 color = ambient + Lo;
 

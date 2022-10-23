@@ -25,6 +25,8 @@ namespace Halo {
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }
 
+		std::string OpenFile(const std::string& filter) const;
+
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 		std::unique_ptr<Window> m_Window;
