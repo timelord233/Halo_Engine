@@ -121,7 +121,7 @@ namespace Halo {
 
 		unsigned int faceWidth = m_Width / 4;
 		unsigned int faceHeight = m_Height / 3;
-		HL_CORE_ASSERT(faceWidth == faceHeight, "Non-square faces!");
+		//HL_CORE_ASSERT(faceWidth == faceHeight, "Non-square faces!");
 
 		std::array<unsigned char*, 6> faces;
 		for (size_t i = 0; i < faces.size(); i++)

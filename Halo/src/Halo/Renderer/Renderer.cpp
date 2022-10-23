@@ -22,4 +22,12 @@ namespace Halo {
 		RenderCommand::DrawIndexed(vertexArray);
 	}
 
+
+
+	void Renderer::SubmitFullscreenQuad(const std::shared_ptr<VertexArray>& vertexArray)
+	{
+		vertexArray->Bind();
+		RenderCommand::DrawIndexed(vertexArray,false);
+	}
+
 }

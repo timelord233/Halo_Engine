@@ -22,10 +22,51 @@ public:
 		m_Mesh.reset(new Mesh("assets/meshes/cerberus.fbx"));
 		m_Texture.reset(Texture2D::Create("assets/textures/cerberus/cerberus_A.png",false));
 		m_CheckerboardTex.reset(Texture2D::Create("assets/editor/Checkerboard.tga"));
+		m_CubeMap.reset(TextureCube::Create("assets/textures/environments/Arches_E_PineTree_Irradiance.tga"));
+
 		m_Shader.reset(Shader::Create("assets/shaders/shader.glsl"));
 		m_LightShader.reset(Shader::Create("assets/shaders/lightCubeShader.glsl"));
 		m_pbrShader.reset(Shader::Create("assets/shaders/pbrShader.glsl"));
-		m_VertexArray.reset(VertexArray::Create());
+		m_SkyboxShader.reset(Shader::Create("assets/shaders/skybox.glsl"));
+
+		// Create fullscreen quad
+		float x = -1;
+		float y = -1;
+		float width = 2, height = 2;
+		struct QuadVertex
+		{
+			glm::vec3 Position;
+			glm::vec2 TexCoord;
+		};
+
+		QuadVertex* data = new QuadVertex[4];
+
+		data[0].Position = glm::vec3(x, y, 0.1f);
+		data[0].TexCoord = glm::vec2(0, 0);
+
+		data[1].Position = glm::vec3(x + width, y, 0.1f);
+		data[1].TexCoord = glm::vec2(1, 0);
+
+		data[2].Position = glm::vec3(x + width, y + height, 0.1f);
+		data[2].TexCoord = glm::vec2(1, 1);
+
+		data[3].Position = glm::vec3(x, y + height, 0.1f);
+		data[3].TexCoord = glm::vec2(0, 1);
+
+		m_FullscreenQuadVertexArray.reset(VertexArray::Create());
+		auto quadVB = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
+		quadVB->SetLayout({
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoord" }
+			});
+
+		uint32_t indices[6] = { 0, 1, 2, 2, 3, 0 };
+		auto quadIB = IndexBuffer::Create(indices, sizeof(indices));
+
+		m_FullscreenQuadVertexArray->AddVertexBuffer(quadVB);
+		m_FullscreenQuadVertexArray->SetIndexBuffer(quadIB);
+
+		/*m_VertexArray.reset(VertexArray::Create());
 
 		float vertices[] = {
 	-0.5f, -0.5f, -0.5f,
@@ -38,18 +79,16 @@ public:
 	 0.5f,  -0.5f,  0.5f,
 		};
 
-		std::shared_ptr<VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+		std::shared_ptr<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
 		BufferLayout layout = {
 			{ ShaderDataType::Float3, "a_Position" },
 		};
 		vertexBuffer->SetLayout(layout);
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 
-		uint32_t indices[] = { 0,1,2,0,2,3,0,4,3,0,4,5,0,7,1,0,7,5,4,7,5,4,7,6,1,6,2,6,7,1,4,2,3,4,2,6 };
-		std::shared_ptr<IndexBuffer> indexBuffer;
-		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)));
-		m_VertexArray->SetIndexBuffer(indexBuffer);
+		uint32_t indices1[] = { 0,1,2,0,2,3,0,4,3,0,4,5,0,7,1,0,7,5,4,7,5,4,7,6,1,6,2,6,7,1,4,2,3,4,2,6 };
+		std::shared_ptr<IndexBuffer> indexBuffer = IndexBuffer::Create(indices1, sizeof(indices1));
+		m_VertexArray->SetIndexBuffer(indexBuffer);*/
 
 		m_LightPos = glm::vec3(10.2f, 10.0f, 20.0f);
 
@@ -68,14 +107,20 @@ public:
 		model = glm::translate(model, m_LightPos);
 		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
 
-		m_Shader->Bind();
-		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 2 + sizeof(int), 4> phongShaderUB;
-		phongShaderUB.Push("u_viewProjection", viewProjection);
-		phongShaderUB.Push("u_lightPos", m_LightPos);
-		phongShaderUB.Push("u_viewPos", m_Camera.GetPosition());
-		phongShaderUB.Push("u_baseColor", 1);
-		m_Shader->UploadUniformBuffer(phongShaderUB);
-		m_Texture->Bind(1);
+		m_SkyboxShader->Bind();
+		std::dynamic_pointer_cast<OpenGLShader>(m_SkyboxShader)->UploadUniformMat4("u_InverseVP", glm::inverse(viewProjection));
+		std::dynamic_pointer_cast<OpenGLShader>(m_SkyboxShader)->UploadUniformInt("u_Texture",0);
+		m_CubeMap->Bind(0);
+		Renderer::SubmitFullscreenQuad(m_FullscreenQuadVertexArray);
+
+		//m_Shader->Bind();
+		//UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 2 + sizeof(int), 4> phongShaderUB;
+		//phongShaderUB.Push("u_viewProjection", viewProjection);
+		//phongShaderUB.Push("u_lightPos", m_LightPos);
+		//phongShaderUB.Push("u_viewPos", m_Camera.GetPosition());
+		//phongShaderUB.Push("u_baseColor", 1);
+		//m_Shader->UploadUniformBuffer(phongShaderUB);
+		//m_Texture->Bind(1);
 
 		m_pbrShader->Bind();
 		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 3 + sizeof(float) * 7 + sizeof(int) * 4, 15> pbrShaderUB;
@@ -106,10 +151,10 @@ public:
 			m_RoughnessInput.TextureMap->Bind(4);
 		m_Mesh->Render();
 
-		m_LightShader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(m_LightShader)->UploadUniformMat4("u_viewProjection", viewProjection);
-		std::dynamic_pointer_cast<OpenGLShader>(m_LightShader)->UploadUniformMat4("u_model", model);
-		Renderer::Submit(m_VertexArray);
+		//m_LightShader->Bind();
+		//std::dynamic_pointer_cast<OpenGLShader>(m_LightShader)->UploadUniformMat4("u_viewProjection", viewProjection);
+		//std::dynamic_pointer_cast<OpenGLShader>(m_LightShader)->UploadUniformMat4("u_model", model);
+		//Renderer::Submit(m_VertexArray);
 
 		Renderer::EndScene();
 
@@ -296,6 +341,10 @@ private:
 	std::shared_ptr<Halo::Shader> m_pbrShader;
 	std::shared_ptr<Halo::VertexArray> m_VertexArray;
 	std::shared_ptr<Halo::Texture2D> m_Texture;
+
+	std::shared_ptr<Halo::TextureCube> m_CubeMap;
+	std::shared_ptr<Halo::Shader> m_SkyboxShader;
+	std::shared_ptr<Halo::VertexArray> m_FullscreenQuadVertexArray;
 
 	struct Light
 	{

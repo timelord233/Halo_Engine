@@ -82,8 +82,7 @@ namespace Halo {
 		}
 
 		m_VertexArray.reset(VertexArray::Create());
-		std::shared_ptr<VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(VertexBuffer::Create(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex)));
+		std::shared_ptr<VertexBuffer> vertexBuffer = VertexBuffer::Create(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex));
 		vertexBuffer->SetLayout({
 				{ ShaderDataType::Float3, "a_Position" },
 				{ ShaderDataType::Float3, "a_Normal" },
@@ -101,8 +100,7 @@ namespace Halo {
 			m_Indices.push_back({ mesh->mFaces[i].mIndices[0], mesh->mFaces[i].mIndices[1], mesh->mFaces[i].mIndices[2] });
 		}
 
-		std::shared_ptr<IndexBuffer> IndexBuffer;
-		IndexBuffer.reset(IndexBuffer::Create(m_Indices.data(), m_Indices.size() * sizeof(Index)));
+		std::shared_ptr<IndexBuffer> IndexBuffer = IndexBuffer::Create(m_Indices.data(), m_Indices.size() * sizeof(Index));
 		m_VertexArray->SetIndexBuffer(IndexBuffer);
 	}
 

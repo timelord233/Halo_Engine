@@ -1401,6 +1401,7 @@
     <ClInclude Include="src\hlpch.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Halo\Renderer\FrameBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Halo\Application.cpp">
@@ -1478,5 +1479,6 @@
     <ClCompile Include="src\hlpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Halo\Renderer\FrameBuffer.cpp" />
   </ItemGroup>
 </Project>

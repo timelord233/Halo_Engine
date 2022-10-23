@@ -140,6 +140,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Halo\Renderer\FrameBuffer.h" />
     <ClInclude Include="Thirdparty\glm\glm\common.hpp" />
     <ClInclude Include="Thirdparty\glm\glm\detail\_features.hpp" />
     <ClInclude Include="Thirdparty\glm\glm\detail\_fixes.hpp" />
@@ -600,6 +601,7 @@
     <ClCompile Include="src\Halo\Log.cpp" />
     <ClCompile Include="src\Halo\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Halo\Renderer\Camera.cpp" />
+    <ClCompile Include="src\Halo\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="src\Halo\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Halo\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Halo\Renderer\Renderer.cpp" />
