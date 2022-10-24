@@ -22,7 +22,8 @@ public:
 		m_Mesh.reset(new Mesh("assets/meshes/cerberus.fbx"));
 		m_Texture.reset(Texture2D::Create("assets/textures/cerberus/cerberus_A.png",false));
 		m_CheckerboardTex.reset(Texture2D::Create("assets/editor/Checkerboard.tga"));
-		CreateEnvironmentMap("assets/env/birchwood_4k.hdr");
+		m_BRDFLUT.reset(Texture2D::Create("assets/textures/BRDF_LUT.tga"));
+		CreateEnvironmentMap("assets/env/Mt-Washington-Gold-Room_Ref.hdr");
 
 		m_Shader.reset(Shader::Create("assets/shaders/shader.glsl"));
 		m_LightShader.reset(Shader::Create("assets/shaders/lightCubeShader.glsl"));
@@ -123,7 +124,7 @@ public:
 		//m_Texture->Bind(1);
 
 		m_pbrShader->Bind();
-		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 3 + sizeof(float) * 7 + sizeof(int) * 4, 15> pbrShaderUB;
+		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 3 + sizeof(float) * 7 + sizeof(int) * 7, 18> pbrShaderUB;
 		pbrShaderUB.Push("u_viewProjection", viewProjection);
 		pbrShaderUB.Push("u_lightPos", m_LightPos);
 		pbrShaderUB.Push("u_viewPos", m_Camera.GetPosition());
@@ -134,6 +135,9 @@ public:
 		pbrShaderUB.Push("u_NormalTexture", 2);
 		pbrShaderUB.Push("u_MetalnessTexture", 3);
 		pbrShaderUB.Push("u_RoughnessTexture", 4);
+		pbrShaderUB.Push("u_IrradianceMap", 5);
+		pbrShaderUB.Push("u_PrefilterMap", 6);
+		pbrShaderUB.Push("u_BRDFLUTTexture", 7);
 		pbrShaderUB.Push("u_AlbedoTexToggle", m_AlbedoInput.UseTexture ? 1.0f : 0.0f);
 		pbrShaderUB.Push("u_NormalTexToggle", m_NormalInput.UseTexture ? 1.0f : 0.0f);
 		pbrShaderUB.Push("u_MetalnessTexToggle", m_MetalnessInput.UseTexture ? 1.0f : 0.0f);
@@ -149,6 +153,10 @@ public:
 			m_MetalnessInput.TextureMap->Bind(3);
 		if (m_RoughnessInput.TextureMap)
 			m_RoughnessInput.TextureMap->Bind(4);
+
+		m_IrradianceMap->Bind(5);
+		m_CubeMap->Bind(6);
+		m_BRDFLUT->Bind(7);
 		m_Mesh->Render();
 
 		//m_LightShader->Bind();
@@ -346,6 +354,7 @@ private:
 	std::shared_ptr<Halo::TextureCube> m_IrradianceMap;
 	std::shared_ptr<Halo::Shader> m_SkyboxShader;
 	std::shared_ptr<Halo::VertexArray> m_FullscreenQuadVertexArray;
+	std::shared_ptr<Halo::Texture2D> m_BRDFLUT;
 
 	struct Light
 	{
