@@ -25,7 +25,7 @@ namespace Halo {
 		RendererID m_RendererID;
 		TextureFormat m_Format;
 		unsigned int m_Width, m_Height;
-
+		bool m_IsHDR = false;
 		unsigned char* m_ImageData;
 
 		std::string m_FilePath;
@@ -35,6 +35,8 @@ namespace Halo {
 	{
 	public:
 		OpenGLTextureCube(const std::string& path);
+		OpenGLTextureCube(TextureFormat format, uint32_t width, uint32_t height);
+
 		virtual ~OpenGLTextureCube();
 
 		virtual void Bind(unsigned int slot = 0) const;
@@ -42,6 +44,7 @@ namespace Halo {
 		virtual TextureFormat GetFormat() const { return m_Format; }
 		virtual unsigned int GetWidth() const { return m_Width; }
 		virtual unsigned int GetHeight() const { return m_Height; }
+		virtual uint32_t GetMipLevelCount() const override;
 
 		virtual const std::string& GetPath() const override { return m_FilePath; }
 

@@ -17,6 +17,8 @@ namespace Halo {
 		virtual void Unbind() const override;
 
 		virtual void UploadUniformBuffer(const UniformBufferBase& uniformBuffer) override;
+
+		virtual uint32_t GetRendererID() const override { return m_RendererID;}
 		
 		void UploadUniformInt(const std::string& name, int value);
 
@@ -31,6 +33,7 @@ namespace Halo {
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
+		int32_t OpenGLShader::GetUniformLocation(const std::string& name) const;
 
 		uint32_t m_RendererID;
 	};

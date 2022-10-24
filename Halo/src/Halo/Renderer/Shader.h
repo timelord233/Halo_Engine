@@ -108,6 +108,7 @@ namespace Halo {
 		static Shader* Create(const std::string & vertexSrc, const std::string & fragmentSrc);
 		static Shader* Create(const std::string& filepath);
 
+		virtual uint32_t GetRendererID() const = 0;
 	private:
 		uint32_t m_RendererID;
 	};

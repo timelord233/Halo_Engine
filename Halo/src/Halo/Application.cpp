@@ -27,6 +27,8 @@ namespace Halo {
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
+
+		RendererAPI::Init();
 	}
 
 	Application::~Application()

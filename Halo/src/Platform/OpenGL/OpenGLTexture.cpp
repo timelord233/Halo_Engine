@@ -15,6 +15,7 @@ namespace Halo {
 		{
 		case Halo::TextureFormat::RGB:     return GL_RGB;
 		case Halo::TextureFormat::RGBA:    return GL_RGBA;
+		case Halo::TextureFormat::Float16: return GL_RGBA16F;
 		}
 		return 0;
 	}
@@ -54,13 +55,26 @@ namespace Halo {
 		: m_FilePath(path)
 	{
 		int width, height, channels;
-		stbi_set_flip_vertically_on_load(true);
-		HL_CORE_INFO("Loading texture {0}, srgb={1}", path, srgb);
-		m_ImageData = stbi_load(path.c_str(), &width, &height, &channels, srgb ? STBI_rgb : STBI_rgb_alpha);
+		if (stbi_is_hdr(path.c_str()))
+		{
+			HL_CORE_INFO("Loading HDR texture {0}, srgb={1}", path, srgb);
+			m_ImageData = (byte*)stbi_loadf(path.c_str(), &width, &height, &channels, 0);
+			m_IsHDR = true;
+			m_Format = TextureFormat::Float16;
+		}
+		else
+		{
+			HL_CORE_INFO("Loading texture {0}, srgb={1}", path, srgb);
+			m_ImageData = stbi_load(path.c_str(), &width, &height, &channels, srgb ? STBI_rgb : STBI_rgb_alpha);
+			HL_CORE_ASSERT(m_ImageData, "Could not read image!");
+			m_Format = TextureFormat::RGBA;
+		}
+
+		if (!m_ImageData)
+			return;
 
 		m_Width = width;
 		m_Height = height;
-		m_Format = TextureFormat::RGBA;
 
 		if (srgb)
 		{
@@ -83,8 +97,12 @@ namespace Halo {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-			glTexImage2D(GL_TEXTURE_2D, 0, HaloToOpenGLTextureFormat(m_Format), m_Width, m_Height, 0, srgb ? GL_SRGB8 : HaloToOpenGLTextureFormat(m_Format), GL_UNSIGNED_BYTE, m_ImageData);
+			GLenum internalFormat = HaloToOpenGLTextureFormat(m_Format);
+			GLenum format = srgb ? GL_SRGB8 : (m_IsHDR ? GL_RGB : HaloToOpenGLTextureFormat(m_Format)); // HDR = GL_RGB for now
+			GLenum type = internalFormat == GL_RGBA16F ? GL_FLOAT : GL_UNSIGNED_BYTE;
+			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Width, m_Height, 0, format, type, m_ImageData);
 			glGenerateMipmap(GL_TEXTURE_2D);
 
 			glBindTexture(GL_TEXTURE_2D, 0);
@@ -194,6 +212,25 @@ namespace Halo {
 		stbi_image_free(m_ImageData);
 	}
 
+	OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, uint32_t width, uint32_t height)
+	{
+		m_Width = width;
+		m_Height = height;
+		m_Format = format;
+
+		uint32_t levels = Texture::CalculateMipMapCount(width, height);
+
+		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_RendererID);
+		glTextureStorage2D(m_RendererID, levels, HaloToOpenGLTextureFormat(m_Format), width, height);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		// glTextureParameterf(m_RendererID, GL_TEXTURE_MAX_ANISOTROPY, 16);
+	}
+
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{
 		glDeleteTextures(1, &m_RendererID);
@@ -201,8 +238,12 @@ namespace Halo {
 
 	void OpenGLTextureCube::Bind(unsigned int slot) const
 	{
-		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
+		glBindTextureUnit(slot, m_RendererID);
+	}
+
+	uint32_t OpenGLTextureCube::GetMipLevelCount() const
+	{
+		return Texture::CalculateMipMapCount(m_Width, m_Height);
 	}
 
 }

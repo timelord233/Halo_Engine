@@ -36,46 +36,75 @@ namespace Halo {
 		glUseProgram(0);
 	}
 
+	int32_t OpenGLShader::GetUniformLocation(const std::string& name) const
+	{
+		int32_t result = glGetUniformLocation(m_RendererID, name.c_str());
+		if (result == -1)
+			HL_CORE_WARN("Could not find uniform '{0}' in shader", name);
+
+		return result;
+	}
+
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(name);
 		glUniform1i(location, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform1f(location, value);
+		glUseProgram(m_RendererID);
+		auto location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location != -1)
+			glUniform1f(location, value);
+		else
+			HL_CORE_WARN("Uniform '{0}' not found!", name);
 	}
 
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform2f(location, value.x, value.y);
+		glUseProgram(m_RendererID);
+		auto location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location != -1)
+			glUniform2f(location, value.x, value.y);
+		else
+			HL_CORE_WARN("Uniform '{0}' not found!", name);
 	}
 
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform3f(location, value.x, value.y, value.z);
+		glUseProgram(m_RendererID);
+		auto location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location != -1)
+			glUniform3f(location, value.x, value.y, value.z);
+		else
+			HL_CORE_WARN("Uniform '{0}' not found!", name);
 	}
 
 	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform4f(location, value.x, value.y, value.z, value.w);
+		glUseProgram(m_RendererID);
+		auto location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location != -1)
+			glUniform4f(location, value.x, value.y, value.z, value.w);
+		else
+			HL_CORE_WARN("Uniform '{0}' not found!", name);
 	}
 
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = GetUniformLocation(name);
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)
 	{
-		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+		glUseProgram(m_RendererID);
+		auto location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (location != -1)
+			glUniformMatrix4fv(location, 1, GL_FALSE, (const float*)&matrix);
+		else
+			HL_CORE_WARN("Uniform '{0}' not found!", name);
 	}
 
 	static GLenum ShaderTypeFromString(const std::string& type)
@@ -84,6 +113,8 @@ namespace Halo {
 			return GL_VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
+		if (type == "compute");
+			return GL_COMPUTE_SHADER;
 
 		HL_CORE_ASSERT(false, "Unknown shader type!");
 		return 0;
@@ -134,45 +165,46 @@ namespace Halo {
 
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		std::vector<GLuint> shaderRendererIDs;
+
 		GLuint program = glCreateProgram();
-		std::vector<GLenum> glShaderIDs(shaderSources.size());
 		for (auto& kv : shaderSources)
 		{
 			GLenum type = kv.first;
-			const std::string& source = kv.second;
+			std::string source = kv.second;
 
-			GLuint shader = glCreateShader(type);
+			GLuint shaderRendererID = glCreateShader(type);
+			const GLchar* sourceCstr = (const GLchar*)source.c_str();
+			glShaderSource(shaderRendererID, 1, &sourceCstr, 0);
 
-			const GLchar* sourceCStr = source.c_str();
-			glShaderSource(shader, 1, &sourceCStr, 0);
-
-			glCompileShader(shader);
+			glCompileShader(shaderRendererID);
 
 			GLint isCompiled = 0;
-			glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+			glGetShaderiv(shaderRendererID, GL_COMPILE_STATUS, &isCompiled);
 			if (isCompiled == GL_FALSE)
 			{
 				GLint maxLength = 0;
-				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+				glGetShaderiv(shaderRendererID, GL_INFO_LOG_LENGTH, &maxLength);
 
+				// The maxLength includes the NULL character
 				std::vector<GLchar> infoLog(maxLength);
-				glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+				glGetShaderInfoLog(shaderRendererID, maxLength, &maxLength, &infoLog[0]);
 
-				glDeleteShader(shader);
+				HL_CORE_ERROR("Shader compilation failed:\n{0}", &infoLog[0]);
 
-				HL_CORE_ERROR("{0}", infoLog.data());
-				HL_CORE_ASSERT(false, "Shader compilation failure!");
-				break;
+				// We don't need the shader anymore.
+				glDeleteShader(shaderRendererID);
+
+				HL_CORE_ASSERT(false, "Failed");
 			}
 
-			glAttachShader(program, shader);
-			glShaderIDs.push_back(shader);
+			shaderRendererIDs.push_back(shaderRendererID);
+			glAttachShader(program, shaderRendererID);
 		}
-
-		m_RendererID = program;
 
 		// Link our program
 		glLinkProgram(program);
+
 		// Note the different functions here: glGetProgram* instead of glGetShader*.
 		GLint isLinked = 0;
 		glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
@@ -180,23 +212,24 @@ namespace Halo {
 		{
 			GLint maxLength = 0;
 			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
 			// The maxLength includes the NULL character
 			std::vector<GLchar> infoLog(maxLength);
 			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+			HL_CORE_ERROR("Shader compilation failed:\n{0}", &infoLog[0]);
 
 			// We don't need the program anymore.
 			glDeleteProgram(program);
-
-			for (auto id : glShaderIDs)
+			// Don't leak shaders either.
+			for (auto id : shaderRendererIDs)
 				glDeleteShader(id);
-
-			HL_CORE_ERROR("{0}", infoLog.data());
-			HL_CORE_ASSERT(false, "Shader link failure!");
-			return;
 		}
 
-		for (auto id : glShaderIDs)
+		// Always detach shaders after a successful link.
+		for (auto id : shaderRendererIDs)
 			glDetachShader(program, id);
+
+		m_RendererID = program;
 	}
 
 	void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
@@ -211,30 +244,35 @@ namespace Halo {
 				const std::string& name = decl.Name;
 				int value = *(int*)(uniformBuffer.GetBuffer() + decl.Offset);
 				UploadUniformInt(name, value);
+				break;
 			}
 			case UniformType::Float:
 			{
 				const std::string& name = decl.Name;
 				float value = *(float*)(uniformBuffer.GetBuffer() + decl.Offset);
 				UploadUniformFloat(name, value);
+				break;
 			}
 			case UniformType::Float3:
 			{
 				const std::string& name = decl.Name;
 				glm::vec3& values = *(glm::vec3*)(uniformBuffer.GetBuffer() + decl.Offset);
 				UploadUniformFloat3(name, values);
+				break;
 			}
 			case UniformType::Float4:
 			{
 				const std::string& name = decl.Name;
 				glm::vec4& values = *(glm::vec4*)(uniformBuffer.GetBuffer() + decl.Offset);
 				UploadUniformFloat4(name, values);
+				break;
 			}
 			case UniformType::Matrix4x4:
 			{
 				const std::string& name = decl.Name;
 				glm::mat4& values = *(glm::mat4*)(uniformBuffer.GetBuffer() + decl.Offset);
 				UploadUniformMat4(name, values);
+				break;
 			}
 			}
 		}

@@ -36,4 +36,22 @@ namespace Halo {
 		return nullptr;
 	}
 
+	std::shared_ptr<Halo::TextureCube> TextureCube::Create(TextureFormat format, uint32_t width, uint32_t height)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None: return nullptr;
+		case RendererAPI::API::OpenGL: return std::make_shared<OpenGLTextureCube>(format, width, height);
+		}
+		return nullptr;
+	}
+
+	uint32_t Texture::CalculateMipMapCount(uint32_t width, uint32_t height)
+	{
+		uint32_t levels = 1;
+		while ((width | height) >> levels)
+			levels++;
+
+		return levels;
+	}
 }

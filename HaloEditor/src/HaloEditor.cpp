@@ -22,7 +22,7 @@ public:
 		m_Mesh.reset(new Mesh("assets/meshes/cerberus.fbx"));
 		m_Texture.reset(Texture2D::Create("assets/textures/cerberus/cerberus_A.png",false));
 		m_CheckerboardTex.reset(Texture2D::Create("assets/editor/Checkerboard.tga"));
-		m_CubeMap.reset(TextureCube::Create("assets/textures/environments/Arches_E_PineTree_Irradiance.tga"));
+		CreateEnvironmentMap("assets/env/birchwood_4k.hdr");
 
 		m_Shader.reset(Shader::Create("assets/shaders/shader.glsl"));
 		m_LightShader.reset(Shader::Create("assets/shaders/lightCubeShader.glsl"));
@@ -343,6 +343,7 @@ private:
 	std::shared_ptr<Halo::Texture2D> m_Texture;
 
 	std::shared_ptr<Halo::TextureCube> m_CubeMap;
+	std::shared_ptr<Halo::TextureCube> m_IrradianceMap;
 	std::shared_ptr<Halo::Shader> m_SkyboxShader;
 	std::shared_ptr<Halo::VertexArray> m_FullscreenQuadVertexArray;
 
@@ -389,6 +390,62 @@ private:
 	Halo::Camera m_Camera;
 	// Editor resources
 	std::unique_ptr<Halo::Texture2D> m_CheckerboardTex;
+
+	void CreateEnvironmentMap(const std::string& filepath)
+	{
+		using namespace Halo;
+		const uint32_t cubemapSize = 2048;
+		const uint32_t irradianceMapSize = 32;
+
+		std::shared_ptr<TextureCube> envUnfiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
+		std::shared_ptr<Shader> equirectangularConversionShader;
+		equirectangularConversionShader.reset(Shader::Create("assets/shaders/EquirectangularToCubeMap.glsl"));
+		std::shared_ptr<Texture2D> envEquirect;
+		envEquirect.reset(Texture2D::Create(filepath));
+		HL_CORE_ASSERT(envEquirect->GetFormat() == TextureFormat::Float16, "Texture is not HDR!");
+
+		equirectangularConversionShader->Bind();
+		envEquirect->Bind();
+
+		glBindImageTexture(0, envUnfiltered->GetRendererID(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glDispatchCompute(cubemapSize / 32, cubemapSize / 32, 6);
+		glGenerateTextureMipmap(envUnfiltered->GetRendererID());
+
+		std::shared_ptr<Shader>	envFilteringShader;
+		envFilteringShader.reset(Shader::Create("assets/shaders/EnvironmentMipFilter.glsl"));
+
+		std::shared_ptr<TextureCube> envFiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
+
+		glCopyImageSubData(envUnfiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
+			envFiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
+			envFiltered->GetWidth(), envFiltered->GetHeight(), 6);
+
+		envFilteringShader->Bind();
+		envUnfiltered->Bind();
+
+		const float deltaRoughness = 1.0f / glm::max((float)(envFiltered->GetMipLevelCount() - 1.0f), 1.0f);
+		for (int level = 1, size = cubemapSize / 2; level < envFiltered->GetMipLevelCount(); level++, size /= 2) // <= ?
+		{
+			const GLuint numGroups = glm::max(1, size / 32);
+			glBindImageTexture(0, envFiltered->GetRendererID(), level, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+			glProgramUniform1f(envFilteringShader->GetRendererID(), 0, level * deltaRoughness);
+			glDispatchCompute(numGroups, numGroups, 6);
+		}
+
+		std::shared_ptr<Shader> envIrradianceShader;
+		envIrradianceShader.reset(Shader::Create("assets/shaders/EnvironmentIrradiance.glsl"));
+
+		std::shared_ptr<TextureCube> irradianceMap = TextureCube::Create(TextureFormat::Float16, irradianceMapSize, irradianceMapSize);
+		envIrradianceShader->Bind();
+		envFiltered->Bind();
+
+		glBindImageTexture(0, irradianceMap->GetRendererID(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glDispatchCompute(irradianceMap->GetWidth() / 32, irradianceMap->GetHeight() / 32, 6);
+		glGenerateTextureMipmap(irradianceMap->GetRendererID());
+
+		m_CubeMap = envUnfiltered;
+		m_IrradianceMap = irradianceMap;
+	}
 };
 
 class HaloEditor : public Halo::Application
