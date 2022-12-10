@@ -90,6 +90,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>..\Halo\Thirdparty\assimp\win64\assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\Halo\ThirdParty\assimp\win64\assimp.dll ..\bin\Debug-windows-x86_64\$(ProjectName)\assimp.dll</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -111,6 +114,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>..\Halo\Thirdparty\assimp\win64\assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\Halo\ThirdParty\assimp\win64\assimp.dll ..\bin\Release-windows-x86_64\$(ProjectName)\assimp.dll</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
@@ -132,6 +138,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>..\Halo\Thirdparty\assimp\win64\assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\Halo\ThirdParty\assimp\win64\assimp.dll ..\bin\Dist-windows-x86_64\$(ProjectName)\assimp.dll</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\HaloEditor.cpp" />

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "Halo/Core/Timestep.h"
 
 namespace Halo {
 
@@ -13,7 +14,7 @@ namespace Halo {
 		const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 
-		void OnUpdate();
+		void OnUpdate(Timestep ts);
 
 		glm::vec3 GetUpDirection();
 		glm::vec3 GetRightDirection();

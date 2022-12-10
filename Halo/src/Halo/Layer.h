@@ -2,6 +2,7 @@
 
 #include "Halo/Core.h"
 #include "Halo/Events/Event.h"
+#include "Halo/Core/Timestep.h"
 
 namespace Halo {
 
@@ -13,7 +14,7 @@ namespace Halo {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep ts) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 

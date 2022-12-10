@@ -9,6 +9,7 @@
 #include "Halo/Input.h"
 #include "Halo/KeyCodes.h"
 #include "Halo/MouseButtonCodes.h"
+#include "Halo/Core/Timestep.h"
 
 // ---Entry Point------------
 #include "Halo/EntryPoint.h"

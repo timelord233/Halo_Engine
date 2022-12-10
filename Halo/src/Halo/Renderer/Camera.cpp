@@ -10,14 +10,14 @@
 
 #define M_PI 3.14159f
 
-namespace Halo {
+namespace Halo { 
 
 	Camera::Camera(const glm::mat4& projectionMatrix)
 		: m_ProjectionMatrix(projectionMatrix)
 	{
-		m_PanSpeed = 0.0015f;
-		m_RotationSpeed = 0.002f;
-		m_ZoomSpeed = 0.2f;
+		m_PanSpeed = 0.015f;
+		m_RotationSpeed = 0.02f;
+		m_ZoomSpeed = 2.0f;
 
 		m_Position = { -10, 10, 10 };
 		m_Rotation = glm::vec3(90.0f, 0.0f, 0.0f);
@@ -29,13 +29,15 @@ namespace Halo {
 		m_Pitch = M_PI / 4.0f;
 	}
 
-	void Camera::OnUpdate()
+	void Camera::OnUpdate(Timestep ts)
 	{
 		if (Input::IsKeyPressed(GLFW_KEY_LEFT_ALT))
 		{
 			const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
-			glm::vec2 delta = mouse - m_InitialMousePosition;
+			glm::vec2 delta = mouse - m_InitialMousePosition; 
 			m_InitialMousePosition = mouse;
+			
+			delta *= (float)ts;
 
 			if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE))
 				MousePan(delta);

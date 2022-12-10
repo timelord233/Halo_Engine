@@ -140,7 +140,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Halo\Renderer\FrameBuffer.h" />
     <ClInclude Include="Thirdparty\glm\glm\common.hpp" />
     <ClInclude Include="Thirdparty\glm\glm\detail\_features.hpp" />
     <ClInclude Include="Thirdparty\glm\glm\detail\_fixes.hpp" />
@@ -559,6 +558,7 @@
     <ClInclude Include="src\Halo.h" />
     <ClInclude Include="src\Halo\Application.h" />
     <ClInclude Include="src\Halo\Core.h" />
+    <ClInclude Include="src\Halo\Core\Timestep.h" />
     <ClInclude Include="src\Halo\EntryPoint.h" />
     <ClInclude Include="src\Halo\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Halo\Events\Event.h" />
@@ -573,6 +573,7 @@
     <ClInclude Include="src\Halo\MouseButtonCodes.h" />
     <ClInclude Include="src\Halo\Renderer\Buffer.h" />
     <ClInclude Include="src\Halo\Renderer\Camera.h" />
+    <ClInclude Include="src\Halo\Renderer\FrameBuffer.h" />
     <ClInclude Include="src\Halo\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Halo\Renderer\Mesh.h" />
     <ClInclude Include="src\Halo\Renderer\RenderCommand.h" />

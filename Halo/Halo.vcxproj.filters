@@ -28,6 +28,9 @@
     <Filter Include="src\Halo">
       <UniqueIdentifier>{40551FCF-2C22-7ADA-553B-68824167AF68}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Halo\Core">
+      <UniqueIdentifier>{98C1BFF9-0482-3B30-CDBC-84AD393C800C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Halo\Events">
       <UniqueIdentifier>{2499D86D-9024-4632-9935-C9260540A232}</UniqueIdentifier>
     </Filter>
@@ -1305,6 +1308,9 @@
     <ClInclude Include="src\Halo\Core.h">
       <Filter>src\Halo</Filter>
     </ClInclude>
+    <ClInclude Include="src\Halo\Core\Timestep.h">
+      <Filter>src\Halo\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Halo\EntryPoint.h">
       <Filter>src\Halo</Filter>
     </ClInclude>
@@ -1345,6 +1351,9 @@
       <Filter>src\Halo\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Halo\Renderer\Camera.h">
+      <Filter>src\Halo\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Halo\Renderer\FrameBuffer.h">
       <Filter>src\Halo\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Halo\Renderer\GraphicsContext.h">
@@ -1401,7 +1410,6 @@
     <ClInclude Include="src\hlpch.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Halo\Renderer\FrameBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Halo\Application.cpp">
@@ -1426,6 +1434,9 @@
       <Filter>src\Halo\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Halo\Renderer\Camera.cpp">
+      <Filter>src\Halo\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Halo\Renderer\FrameBuffer.cpp">
       <Filter>src\Halo\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Halo\Renderer\Mesh.cpp">
@@ -1479,6 +1490,5 @@
     <ClCompile Include="src\hlpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Halo\Renderer\FrameBuffer.cpp" />
   </ItemGroup>
 </Project>

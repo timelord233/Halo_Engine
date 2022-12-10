@@ -1,11 +1,13 @@
 workspace "Halo"
 	architecture "x64"
+	startproject "HaloEditor"
 	configurations
 	{
 		"Debug",
 		"Release",
 		"Dist"
 	}
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
@@ -111,6 +113,9 @@ project "HaloEditor"
 		"Halo",
 		"Halo/Thirdparty/assimp/win64/assimp.lib"
 	}
+
+	postbuildcommands { "copy ..\\Halo\\ThirdParty\\assimp\\win64\\assimp.dll ..\\bin\\" .. outputdir .. "\\%{prj.name}\\assimp.dll"}
+	
 	filter "system:windows"
 		cppdialect "C++17"
 		systemversion "latest"

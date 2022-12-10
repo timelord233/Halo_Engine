@@ -17,7 +17,7 @@ public:
 	}
 
 	void OnAttach() override 
-	{
+	{ 
 		using namespace Halo;
 		m_Mesh.reset(new Mesh("assets/meshes/cerberus.fbx"));
 		m_Texture.reset(Texture2D::Create("assets/textures/cerberus/cerberus_A.png",false));
@@ -95,9 +95,10 @@ public:
 
 	}
 
-	void OnUpdate() override
-	{
+	void OnUpdate(Halo::Timestep ts) override
+	{ 
 		using namespace Halo;
+
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		RenderCommand::Clear();
 
@@ -166,7 +167,7 @@ public:
 
 		Renderer::EndScene();
 
-		m_Camera.OnUpdate();
+		m_Camera.OnUpdate(ts);
 	}
 
 	virtual void OnImGuiRender() override

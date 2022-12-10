@@ -4,6 +4,7 @@
 #include "Halo/Input.h"
 
 #include "Halo/Renderer/Renderer.h"
+#include "Halo/Core/Timestep.h"
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -39,12 +40,15 @@ namespace Halo {
 	void Application::Run()
 	{
 		while (m_Running)
-		{
+		{ 
+			float time = (float)glfwGetTime();
+			Timestep timestep = time - m_LastFrameTime; 
+			m_LastFrameTime = time; 
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(timestep); 
 
 			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
+			for (Layer* layer : m_LayerStack) 
 				layer->OnImGuiRender();
 			m_ImGuiLayer->End();
 
