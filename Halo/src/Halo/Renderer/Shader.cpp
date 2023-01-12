@@ -6,28 +6,32 @@
 
 namespace Halo {
 
-	Shader* Shader::Create(const std::string& filepath)
-	{
-		switch(Renderer::GetAPI())
-		{
-			case RendererAPI::API::None:    HL_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return new OpenGLShader(filepath);
-		}
+	std::vector<SharedPtr<Shader>> Shader::s_AllShaders;
 
-		HL_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
-	Shader* Shader::Create(const std::string& vertexSrc, const std::string& fragmentSrc)
+	SharedPtr<Shader> Shader::Create(const std::string& filepath)
 	{
+		SharedPtr<Shader> result = nullptr;
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:    HL_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return new OpenGLShader(vertexSrc, fragmentSrc);
+		case RendererAPI::API::OpenGL:  result = std::make_shared<OpenGLShader>(filepath);
 		}
+		s_AllShaders.push_back(result);
+		return result;
+	}
 
-		HL_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
+	SharedPtr<Shader> Shader::CreateFromString(const std::string& source)
+	{
+		SharedPtr<Shader> result = nullptr;
+
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:    HL_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:  result = OpenGLShader::CreateFromString(source);
+		}
+		s_AllShaders.push_back(result);
+		return result;
 	}
 
 }

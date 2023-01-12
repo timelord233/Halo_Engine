@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Halo/Core.h"
+#include "Halo/Core/Base.h"
 #include "RendererAPI.h"
 
 namespace Halo {
@@ -19,6 +19,7 @@ namespace Halo {
 		virtual ~Texture() {}
 
 		virtual RendererID GetRendererID() const = 0;
+		virtual void Bind(uint32_t slot = 0) const = 0;
 
 		static uint32_t CalculateMipMapCount(uint32_t width, uint32_t height);
 	};
@@ -28,8 +29,6 @@ namespace Halo {
 	public:
 		static Texture2D* Create(TextureFormat format, unsigned int width, unsigned int height);
 		static Texture2D* Create(const std::string& path, bool srgb = false);
-
-		virtual void Bind(unsigned int slot = 0) const = 0;
 
 		virtual TextureFormat GetFormat() const = 0;
 		virtual unsigned int GetWidth() const = 0;
@@ -43,8 +42,6 @@ namespace Halo {
 	public:
 		static TextureCube* Create(const std::string& path);
 		static std::shared_ptr<TextureCube> Create(TextureFormat format, uint32_t width, uint32_t height);
-
-		virtual void Bind(unsigned int slot = 0) const = 0;
 
 		virtual TextureFormat GetFormat() const = 0;
 		virtual unsigned int GetWidth() const = 0;

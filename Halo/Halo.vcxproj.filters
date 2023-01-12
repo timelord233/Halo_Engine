@@ -1305,9 +1305,6 @@
     <ClInclude Include="src\Halo\Application.h">
       <Filter>src\Halo</Filter>
     </ClInclude>
-    <ClInclude Include="src\Halo\Core.h">
-      <Filter>src\Halo</Filter>
-    </ClInclude>
     <ClInclude Include="src\Halo\Core\Timestep.h">
       <Filter>src\Halo\Core</Filter>
     </ClInclude>
@@ -1339,9 +1336,6 @@
       <Filter>src\Halo</Filter>
     </ClInclude>
     <ClInclude Include="src\Halo\LayerStack.h">
-      <Filter>src\Halo</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Halo\Log.h">
       <Filter>src\Halo</Filter>
     </ClInclude>
     <ClInclude Include="src\Halo\MouseButtonCodes.h">
@@ -1410,6 +1404,16 @@
     <ClInclude Include="src\hlpch.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Halo\Renderer\Material.h" />
+    <ClInclude Include="src\Halo\Core\Base.h">
+      <Filter>src\Halo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Halo\Renderer\ShaderUniform.h" />
+    <ClInclude Include="src\Halo\Core\Log.h">
+      <Filter>src\Halo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Halo\Core\Buffer.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShaderUniform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Halo\Application.cpp">
@@ -1425,9 +1429,6 @@
       <Filter>src\Halo</Filter>
     </ClCompile>
     <ClCompile Include="src\Halo\LayerStack.cpp">
-      <Filter>src\Halo</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Halo\Log.cpp">
       <Filter>src\Halo</Filter>
     </ClCompile>
     <ClCompile Include="src\Halo\Renderer\Buffer.cpp">
@@ -1490,5 +1491,10 @@
     <ClCompile Include="src\hlpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Halo\Renderer\Material.cpp" />
+    <ClCompile Include="src\Halo\Core\Log.cpp">
+      <Filter>src\Halo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLShaderUniform.cpp" />
   </ItemGroup>
 </Project>

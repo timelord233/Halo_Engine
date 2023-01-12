@@ -140,6 +140,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Halo\Core\Buffer.h" />
+    <ClInclude Include="src\Halo\Renderer\Material.h" />
+    <ClInclude Include="src\Halo\Renderer\ShaderUniform.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShaderUniform.h" />
     <ClInclude Include="Thirdparty\glm\glm\common.hpp" />
     <ClInclude Include="Thirdparty\glm\glm\detail\_features.hpp" />
     <ClInclude Include="Thirdparty\glm\glm\detail\_fixes.hpp" />
@@ -557,7 +561,7 @@
     <ClInclude Include="Thirdparty\glm\glm\vector_relational.hpp" />
     <ClInclude Include="src\Halo.h" />
     <ClInclude Include="src\Halo\Application.h" />
-    <ClInclude Include="src\Halo\Core.h" />
+    <ClInclude Include="src\Halo\Core\Base.h" />
     <ClInclude Include="src\Halo\Core\Timestep.h" />
     <ClInclude Include="src\Halo\EntryPoint.h" />
     <ClInclude Include="src\Halo\Events\ApplicationEvent.h" />
@@ -569,7 +573,7 @@
     <ClInclude Include="src\Halo\KeyCodes.h" />
     <ClInclude Include="src\Halo\Layer.h" />
     <ClInclude Include="src\Halo\LayerStack.h" />
-    <ClInclude Include="src\Halo\Log.h" />
+    <ClInclude Include="src\Halo\Core\Log.h" />
     <ClInclude Include="src\Halo\MouseButtonCodes.h" />
     <ClInclude Include="src\Halo\Renderer\Buffer.h" />
     <ClInclude Include="src\Halo\Renderer\Camera.h" />
@@ -599,10 +603,11 @@
     <ClCompile Include="src\Halo\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Halo\Layer.cpp" />
     <ClCompile Include="src\Halo\LayerStack.cpp" />
-    <ClCompile Include="src\Halo\Log.cpp" />
+    <ClCompile Include="src\Halo\Core\Log.cpp" />
     <ClCompile Include="src\Halo\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Halo\Renderer\Camera.cpp" />
     <ClCompile Include="src\Halo\Renderer\FrameBuffer.cpp" />
+    <ClCompile Include="src\Halo\Renderer\Material.cpp" />
     <ClCompile Include="src\Halo\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Halo\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Halo\Renderer\Renderer.cpp" />
@@ -615,6 +620,7 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLShaderUniform.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />

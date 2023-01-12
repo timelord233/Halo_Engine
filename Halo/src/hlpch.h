@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Halo/Log.h"
+#include "Halo/Core/Log.h"
 
 #ifdef HL_PLATFORM_WINDOWS
 #include <Windows.h>

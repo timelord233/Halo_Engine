@@ -4,7 +4,7 @@
 
 #include "Halo/Application.h"
 #include "Halo/Layer.h"
-#include "Halo/Log.h"
+#include "Halo/Core/Log.h"
 #include "Halo/ImGui/ImGuiLayer.h"
 #include "Halo/Input.h"
 #include "Halo/KeyCodes.h"
@@ -22,4 +22,5 @@
 #include "Halo/Renderer/Mesh.h"
 #include "Halo/Renderer/Camera.h"
 #include "Halo/Renderer/Texture.h"
+#include "Halo/Renderer/Material.h"
 //----------------------------

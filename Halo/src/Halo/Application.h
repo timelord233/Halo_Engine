@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "Core/Base.h"
 #include "Events/Event.h"
 #include "Window.h"
 #include "Halo/LayerStack.h"
@@ -31,7 +31,7 @@ namespace Halo {
 		bool OnWindowClose(WindowCloseEvent& e);
 
 	private:
-		std::unique_ptr<Window> m_Window;
+		UniquePtr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;

@@ -2,7 +2,7 @@
 
 #include "hlpch.h"
 
-#include "Halo/Core.h"
+#include "Halo/Core/Base.h"
 #include "Halo/Events/Event.h"
 
 namespace Halo {

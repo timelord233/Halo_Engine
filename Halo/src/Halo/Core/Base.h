@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #ifdef HL_PLATFORM_WINDOWS
 #if HL_DYNAMIC_LINK
 	#ifdef HL_BUILD_DLL
@@ -29,3 +31,16 @@
 #define BIT(X) (1<<X)
 
 #define HL_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
+// Pointer wrappers
+namespace Halo {
+
+	template<typename T>
+	using UniquePtr = std::unique_ptr<T>;
+
+	template<typename T>
+	using SharedPtr = std::shared_ptr<T>;
+
+	using byte = unsigned char;
+
+}

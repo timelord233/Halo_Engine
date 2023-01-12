@@ -30,6 +30,7 @@ namespace Halo {
 	}
 
 	void Camera::OnUpdate(Timestep ts)
+
 	{
 		if (Input::IsKeyPressed(GLFW_KEY_LEFT_ALT))
 		{

@@ -25,10 +25,12 @@ public:
 		m_BRDFLUT.reset(Texture2D::Create("assets/textures/BRDF_LUT.tga"));
 		CreateEnvironmentMap("assets/env/Mt-Washington-Gold-Room_Ref.hdr");
 
-		m_Shader.reset(Shader::Create("assets/shaders/shader.glsl"));
-		m_LightShader.reset(Shader::Create("assets/shaders/lightCubeShader.glsl"));
-		m_pbrShader.reset(Shader::Create("assets/shaders/pbrShader.glsl"));
-		m_SkyboxShader.reset(Shader::Create("assets/shaders/skybox.glsl"));
+		m_Shader = Shader::Create("assets/shaders/shader.glsl");
+		m_LightShader = Shader::Create("assets/shaders/lightCubeShader.glsl");
+		m_PBRShader = Shader::Create("assets/shaders/pbrShader.glsl");
+		m_SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
+
+		m_PBRMaterial.reset(new Halo::Material(m_PBRShader));
 
 		// Create fullscreen quad
 		float x = -1;
@@ -80,7 +82,7 @@ public:
 	 0.5f,  -0.5f,  0.5f,
 		};
 
-		std::shared_ptr<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
+		Halo::SharedPtr<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
 		BufferLayout layout = {
 			{ ShaderDataType::Float3, "a_Position" },
 		};
@@ -88,7 +90,7 @@ public:
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 
 		uint32_t indices1[] = { 0,1,2,0,2,3,0,4,3,0,4,5,0,7,1,0,7,5,4,7,5,4,7,6,1,6,2,6,7,1,4,2,3,4,2,6 };
-		std::shared_ptr<IndexBuffer> indexBuffer = IndexBuffer::Create(indices1, sizeof(indices1));
+		Halo::SharedPtr<IndexBuffer> indexBuffer = IndexBuffer::Create(indices1, sizeof(indices1));
 		m_VertexArray->SetIndexBuffer(indexBuffer);*/
 
 		m_LightPos = glm::vec3(10.2f, 10.0f, 20.0f);
@@ -110,8 +112,8 @@ public:
 		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
 
 		m_SkyboxShader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(m_SkyboxShader)->UploadUniformMat4("u_InverseVP", glm::inverse(viewProjection));
-		std::dynamic_pointer_cast<OpenGLShader>(m_SkyboxShader)->UploadUniformInt("u_Texture",0);
+		std::dynamic_pointer_cast<OpenGLShader>(m_SkyboxShader)->SetMat4("u_InverseVP", glm::inverse(viewProjection));
+		std::dynamic_pointer_cast<OpenGLShader>(m_SkyboxShader)->SetInt("u_Texture",0);
 		m_CubeMap->Bind(0);
 		Renderer::SubmitFullscreenQuad(m_FullscreenQuadVertexArray);
 
@@ -124,7 +126,19 @@ public:
 		//m_Shader->UploadUniformBuffer(phongShaderUB);
 		//m_Texture->Bind(1);
 
-		m_pbrShader->Bind();
+		m_PBRMaterial->Set("u_viewProjection", viewProjection);
+		m_PBRMaterial->Set("u_lightPos", m_LightPos);
+		m_PBRMaterial->Set("u_viewPos", m_Camera.GetPosition());
+		m_PBRMaterial->Set("u_AlbedoColor", m_AlbedoInput.Color);
+		m_PBRMaterial->Set("u_Metalness", m_MetalnessInput.Value);
+		m_PBRMaterial->Set("u_Roughness", m_RoughnessInput.Value);
+		m_PBRMaterial->Set("u_AlbedoTexToggle", m_AlbedoInput.UseTexture ? 1.0f : 0.0f);
+		m_PBRMaterial->Set("u_NormalTexToggle", m_NormalInput.UseTexture ? 1.0f : 0.0f);
+		m_PBRMaterial->Set("u_MetalnessTexToggle", m_MetalnessInput.UseTexture ? 1.0f : 0.0f);
+		m_PBRMaterial->Set("u_RoughnessTexToggle", m_RoughnessInput.UseTexture ? 1.0f : 0.0f);
+		m_PBRMaterial->Set("u_ao", 1.0f);
+
+		/*m_PBRShader->Bind();
 		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 3 + sizeof(float) * 7 + sizeof(int) * 7, 18> pbrShaderUB;
 		pbrShaderUB.Push("u_viewProjection", viewProjection);
 		pbrShaderUB.Push("u_lightPos", m_LightPos);
@@ -144,20 +158,21 @@ public:
 		pbrShaderUB.Push("u_MetalnessTexToggle", m_MetalnessInput.UseTexture ? 1.0f : 0.0f);
 		pbrShaderUB.Push("u_RoughnessTexToggle", m_RoughnessInput.UseTexture ? 1.0f : 0.0f);
 		pbrShaderUB.Push("u_ao", 1.0f);
-		m_pbrShader->UploadUniformBuffer(pbrShaderUB);
+		m_PBRShader->UploadUniformBuffer(pbrShaderUB);*/
 
 		if (m_AlbedoInput.TextureMap)
-			m_AlbedoInput.TextureMap->Bind(1);
+			m_PBRMaterial->Set("u_AlbedoTexture", m_AlbedoInput.TextureMap);
 		if (m_NormalInput.TextureMap)
-			m_NormalInput.TextureMap->Bind(2);
+			m_PBRMaterial->Set("u_NormalTexture", m_NormalInput.TextureMap);
 		if (m_MetalnessInput.TextureMap)
-			m_MetalnessInput.TextureMap->Bind(3);
+			m_PBRMaterial->Set("u_RoughnessTexture", m_MetalnessInput.TextureMap);
 		if (m_RoughnessInput.TextureMap)
-			m_RoughnessInput.TextureMap->Bind(4);
+			m_PBRMaterial->Set("u_RoughnessTexture", m_RoughnessInput.TextureMap);
 
-		m_IrradianceMap->Bind(5);
-		m_CubeMap->Bind(6);
-		m_BRDFLUT->Bind(7);
+		m_PBRMaterial->Set("u_IrradianceMap", m_IrradianceMap);
+		m_PBRMaterial->Set("u_PrefilterMap", m_CubeMap);
+		m_PBRMaterial->Set("u_BRDFLUTTexture", m_BRDFLUT);
+		m_PBRMaterial->Bind();
 		m_Mesh->Render();
 
 		//m_LightShader->Bind();
@@ -344,18 +359,20 @@ public:
 		}
 	}
 private:
-	std::shared_ptr<Halo::Mesh> m_Mesh;
-	std::shared_ptr<Halo::Shader> m_Shader;
-	std::shared_ptr<Halo::Shader> m_LightShader;
-	std::shared_ptr<Halo::Shader> m_pbrShader;
-	std::shared_ptr<Halo::VertexArray> m_VertexArray;
-	std::shared_ptr<Halo::Texture2D> m_Texture;
+	Halo::SharedPtr<Halo::Mesh> m_Mesh;
+	Halo::SharedPtr<Halo::Shader> m_Shader;
+	Halo::SharedPtr<Halo::Shader> m_LightShader;
+	Halo::SharedPtr<Halo::Shader> m_PBRShader;
+	Halo::SharedPtr<Halo::VertexArray> m_VertexArray;
+	Halo::SharedPtr<Halo::Texture2D> m_Texture;
 
-	std::shared_ptr<Halo::TextureCube> m_CubeMap;
-	std::shared_ptr<Halo::TextureCube> m_IrradianceMap;
-	std::shared_ptr<Halo::Shader> m_SkyboxShader;
-	std::shared_ptr<Halo::VertexArray> m_FullscreenQuadVertexArray;
-	std::shared_ptr<Halo::Texture2D> m_BRDFLUT;
+	Halo::SharedPtr<Halo::TextureCube> m_CubeMap;
+	Halo::SharedPtr<Halo::TextureCube> m_IrradianceMap;
+	Halo::SharedPtr<Halo::Shader> m_SkyboxShader;
+	Halo::SharedPtr<Halo::VertexArray> m_FullscreenQuadVertexArray;
+	Halo::SharedPtr<Halo::Texture2D> m_BRDFLUT;
+
+	Halo::SharedPtr<Halo::Material> m_PBRMaterial;
 
 	struct Light
 	{
@@ -368,7 +385,7 @@ private:
 	struct AlbedoInput
 	{
 		glm::vec3 Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/Engine/Rendering/Materials/PhysicallyBased
-		std::unique_ptr<Halo::Texture2D> TextureMap;
+		Halo::SharedPtr<Halo::Texture2D> TextureMap;
 		bool SRGB = true;
 		bool UseTexture = false;
 	};
@@ -377,14 +394,14 @@ private:
 	struct MetalnessInput
 	{
 		float Value = 1.0f;
-		std::unique_ptr<Halo::Texture2D> TextureMap;
+		Halo::SharedPtr<Halo::Texture2D> TextureMap;
 		bool UseTexture = false;
 	};
 	MetalnessInput m_MetalnessInput;
 
 	struct NormalInput
 	{
-		std::unique_ptr<Halo::Texture2D> TextureMap;
+		Halo::SharedPtr<Halo::Texture2D> TextureMap;
 		bool UseTexture = false;
 	};
 	NormalInput m_NormalInput;
@@ -392,14 +409,14 @@ private:
 	struct RoughnessInput
 	{
 		float Value = 0.5f;
-		std::unique_ptr<Halo::Texture2D> TextureMap;
+		Halo::SharedPtr<Halo::Texture2D> TextureMap;
 		bool UseTexture = false;
 	};
 	RoughnessInput m_RoughnessInput;
 
 	Halo::Camera m_Camera;
 	// Editor resources
-	std::unique_ptr<Halo::Texture2D> m_CheckerboardTex;
+	Halo::SharedPtr<Halo::Texture2D> m_CheckerboardTex;
 
 	void CreateEnvironmentMap(const std::string& filepath)
 	{
@@ -407,10 +424,9 @@ private:
 		const uint32_t cubemapSize = 2048;
 		const uint32_t irradianceMapSize = 32;
 
-		std::shared_ptr<TextureCube> envUnfiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
-		std::shared_ptr<Shader> equirectangularConversionShader;
-		equirectangularConversionShader.reset(Shader::Create("assets/shaders/EquirectangularToCubeMap.glsl"));
-		std::shared_ptr<Texture2D> envEquirect;
+		Halo::SharedPtr<TextureCube> envUnfiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
+		Halo::SharedPtr<Shader> equirectangularConversionShader = Shader::Create("assets/shaders/EquirectangularToCubeMap.glsl");
+		Halo::SharedPtr<Texture2D> envEquirect;
 		envEquirect.reset(Texture2D::Create(filepath));
 		HL_CORE_ASSERT(envEquirect->GetFormat() == TextureFormat::Float16, "Texture is not HDR!");
 
@@ -421,10 +437,9 @@ private:
 		glDispatchCompute(cubemapSize / 32, cubemapSize / 32, 6);
 		glGenerateTextureMipmap(envUnfiltered->GetRendererID());
 
-		std::shared_ptr<Shader>	envFilteringShader;
-		envFilteringShader.reset(Shader::Create("assets/shaders/EnvironmentMipFilter.glsl"));
+		Halo::SharedPtr<Shader>	envFilteringShader = Shader::Create("assets/shaders/EnvironmentMipFilter.glsl");
 
-		std::shared_ptr<TextureCube> envFiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
+		Halo::SharedPtr<TextureCube> envFiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
 
 		glCopyImageSubData(envUnfiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
 			envFiltered->GetRendererID(), GL_TEXTURE_CUBE_MAP, 0, 0, 0, 0,
@@ -442,10 +457,9 @@ private:
 			glDispatchCompute(numGroups, numGroups, 6);
 		}
 
-		std::shared_ptr<Shader> envIrradianceShader;
-		envIrradianceShader.reset(Shader::Create("assets/shaders/EnvironmentIrradiance.glsl"));
+		Halo::SharedPtr<Shader> envIrradianceShader = Shader::Create("assets/shaders/EnvironmentIrradiance.glsl");
 
-		std::shared_ptr<TextureCube> irradianceMap = TextureCube::Create(TextureFormat::Float16, irradianceMapSize, irradianceMapSize);
+		Halo::SharedPtr<TextureCube> irradianceMap = TextureCube::Create(TextureFormat::Float16, irradianceMapSize, irradianceMapSize);
 		envIrradianceShader->Bind();
 		envFiltered->Bind();
 

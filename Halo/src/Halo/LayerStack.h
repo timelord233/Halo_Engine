@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Halo/Core.h"
+#include "Halo/Core/Base.h"
 #include "Layer.h"
 
 #include <vector>

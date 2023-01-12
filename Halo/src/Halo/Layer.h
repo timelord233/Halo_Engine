@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Halo/Core.h"
+#include "Halo/Core/Base.h"
 #include "Halo/Events/Event.h"
 #include "Halo/Core/Timestep.h"
 
