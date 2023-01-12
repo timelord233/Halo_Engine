@@ -1414,6 +1414,7 @@
     </ClInclude>
     <ClInclude Include="src\Halo\Core\Buffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShaderUniform.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Halo\Application.cpp">
@@ -1496,5 +1497,6 @@
       <Filter>src\Halo</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLShaderUniform.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
   </ItemGroup>
 </Project>

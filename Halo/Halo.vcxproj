@@ -143,6 +143,7 @@
     <ClInclude Include="src\Halo\Core\Buffer.h" />
     <ClInclude Include="src\Halo\Renderer\Material.h" />
     <ClInclude Include="src\Halo\Renderer\ShaderUniform.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShaderUniform.h" />
     <ClInclude Include="Thirdparty\glm\glm\common.hpp" />
     <ClInclude Include="Thirdparty\glm\glm\detail\_features.hpp" />
@@ -618,6 +619,7 @@
     <ClCompile Include="src\Halo\ThirdParty\stb_image.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShaderUniform.cpp" />

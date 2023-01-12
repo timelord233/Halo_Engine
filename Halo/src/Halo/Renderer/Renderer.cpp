@@ -23,7 +23,6 @@ namespace Halo {
 	}
 
 
-
 	void Renderer::SubmitFullscreenQuad(const std::shared_ptr<VertexArray>& vertexArray)
 	{
 		vertexArray->Bind();

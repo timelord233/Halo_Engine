@@ -7,6 +7,19 @@
 
 #include "Platform/OpenGL/OpenGLShader.h"
 
+static void ImGuiShowHelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
+
 class EditorLayer : public Halo::Layer
 {
 public:
@@ -29,8 +42,12 @@ public:
 		m_LightShader = Shader::Create("assets/shaders/lightCubeShader.glsl");
 		m_PBRShader = Shader::Create("assets/shaders/pbrShader.glsl");
 		m_SkyboxShader = Shader::Create("assets/shaders/skybox.glsl");
+		m_HDRShader = Shader::Create("assets/shaders/hdr.glsl");
 
 		m_PBRMaterial.reset(new Halo::Material(m_PBRShader));
+
+		m_Framebuffer.reset(Halo::Framebuffer::Create(1280, 720, Halo::FramebufferFormat::RGBA16F));
+		m_FinalPresentBuffer.reset(Halo::Framebuffer::Create(1280, 720, Halo::FramebufferFormat::RGBA8));
 
 		// Create fullscreen quad
 		float x = -1;
@@ -101,15 +118,17 @@ public:
 	{ 
 		using namespace Halo;
 
-		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-		RenderCommand::Clear();
-
 		Renderer::BeginScene();
 
 		glm::mat4 viewProjection = m_Camera.GetProjectionMatrix() * m_Camera.GetViewMatrix();
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, m_LightPos);
 		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+
+		m_Framebuffer->Bind();
+
+		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		RenderCommand::Clear();
 
 		m_SkyboxShader->Bind();
 		std::dynamic_pointer_cast<OpenGLShader>(m_SkyboxShader)->SetMat4("u_InverseVP", glm::inverse(viewProjection));
@@ -138,28 +157,6 @@ public:
 		m_PBRMaterial->Set("u_RoughnessTexToggle", m_RoughnessInput.UseTexture ? 1.0f : 0.0f);
 		m_PBRMaterial->Set("u_ao", 1.0f);
 
-		/*m_PBRShader->Bind();
-		UniformBufferDeclaration<sizeof(glm::mat4) + sizeof(glm::vec3) * 3 + sizeof(float) * 7 + sizeof(int) * 7, 18> pbrShaderUB;
-		pbrShaderUB.Push("u_viewProjection", viewProjection);
-		pbrShaderUB.Push("u_lightPos", m_LightPos);
-		pbrShaderUB.Push("u_viewPos", m_Camera.GetPosition());
-		pbrShaderUB.Push("u_AlbedoColor", m_AlbedoInput.Color);
-		pbrShaderUB.Push("u_Metalness", m_MetalnessInput.Value);
-		pbrShaderUB.Push("u_Roughness", m_RoughnessInput.Value);
-		pbrShaderUB.Push("u_AlbedoTexture", 1);
-		pbrShaderUB.Push("u_NormalTexture", 2);
-		pbrShaderUB.Push("u_MetalnessTexture", 3);
-		pbrShaderUB.Push("u_RoughnessTexture", 4);
-		pbrShaderUB.Push("u_IrradianceMap", 5);
-		pbrShaderUB.Push("u_PrefilterMap", 6);
-		pbrShaderUB.Push("u_BRDFLUTTexture", 7);
-		pbrShaderUB.Push("u_AlbedoTexToggle", m_AlbedoInput.UseTexture ? 1.0f : 0.0f);
-		pbrShaderUB.Push("u_NormalTexToggle", m_NormalInput.UseTexture ? 1.0f : 0.0f);
-		pbrShaderUB.Push("u_MetalnessTexToggle", m_MetalnessInput.UseTexture ? 1.0f : 0.0f);
-		pbrShaderUB.Push("u_RoughnessTexToggle", m_RoughnessInput.UseTexture ? 1.0f : 0.0f);
-		pbrShaderUB.Push("u_ao", 1.0f);
-		m_PBRShader->UploadUniformBuffer(pbrShaderUB);*/
-
 		if (m_AlbedoInput.TextureMap)
 			m_PBRMaterial->Set("u_AlbedoTexture", m_AlbedoInput.TextureMap);
 		if (m_NormalInput.TextureMap)
@@ -182,11 +179,128 @@ public:
 
 		Renderer::EndScene();
 
+		m_Framebuffer->Unbind();
+
+		m_FinalPresentBuffer->Bind();
+		m_HDRShader->Bind();
+		m_HDRShader->SetFloat("u_Exposure", m_Exposure);
+		m_Framebuffer->BindTexture();
+		Renderer::SubmitFullscreenQuad(m_FullscreenQuadVertexArray);
+		m_FinalPresentBuffer->Unbind();
+
 		m_Camera.OnUpdate(ts);
+	}
+
+	enum class PropertyFlag
+	{
+		None = 0, ColorProperty = 1
+	};
+
+	void Property(const std::string& name, bool& value)
+	{
+		ImGui::Text(name.c_str());
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		std::string id = "##" + name;
+		ImGui::Checkbox(id.c_str(), &value);
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+	}
+
+	void Property(const std::string& name, float& value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None)
+	{
+		ImGui::Text(name.c_str());
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		std::string id = "##" + name;
+		ImGui::SliderFloat(id.c_str(), &value, min, max);
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+	}
+
+	void Property(const std::string& name, glm::vec3& value, PropertyFlag flags)
+	{
+		Property(name, value, -1.0f, 1.0f, flags);
+	}
+
+	void Property(const std::string& name, glm::vec3& value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None)
+	{
+		ImGui::Text(name.c_str());
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		std::string id = "##" + name;
+		if ((int)flags & (int)PropertyFlag::ColorProperty)
+			ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+		else
+			ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max);
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+	}
+
+	void Property(const std::string& name, glm::vec4& value, PropertyFlag flags)
+	{
+		Property(name, value, -1.0f, 1.0f, flags);
+	}
+
+	void Property(const std::string& name, glm::vec4& value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None)
+	{
+		ImGui::Text(name.c_str());
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		std::string id = "##" + name;
+		if ((int)flags & (int)PropertyFlag::ColorProperty)
+			ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+		else
+			ImGui::SliderFloat4(id.c_str(), glm::value_ptr(value), min, max);
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
 	}
 
 	virtual void OnImGuiRender() override
 	{
+		static bool p_open = true;
+
+		static bool opt_fullscreen_persistant = true;
+		static ImGuiDockNodeFlags opt_flags = ImGuiDockNodeFlags_None;
+		bool opt_fullscreen = opt_fullscreen_persistant;
+
+		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+		// because it would be confusing to have two docking targets within each others.
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (opt_fullscreen)
+		{
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		}
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("DockSpace Demo", &p_open, window_flags);
+		ImGui::PopStyleVar();
+
+		if (opt_fullscreen)
+			ImGui::PopStyleVar(2);
+
+		// Dockspace
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
+		}
 
 		ImGui::Begin("Test");
 		auto cameraPosition = m_Camera.GetPosition();
@@ -195,7 +309,30 @@ public:
 		ImGui::Text("Camera Forward: %.2f, %.2f, %.2f", cameraForward.x, cameraForward.y, cameraForward.z);
 		ImGui::End();
 
-		ImGui::Begin("Settings");
+		// Editor Panel ------------------------------------------------------------------------------
+		ImGui::Begin("Model");
+		//ImGui::RadioButton("Spheres", (int*)&m_Scene, (int)Scene::Spheres);
+		//ImGui::SameLine();
+		//ImGui::RadioButton("Model", (int*)&m_Scene, (int)Scene::Model);
+
+		ImGui::Begin("Environment");
+
+		ImGui::Columns(2);
+		ImGui::AlignTextToFramePadding();
+
+		Property("Light Direction", m_Light.Direction);
+		Property("Light Radiance", m_Light.Radiance, PropertyFlag::ColorProperty);
+		//Property("Light Multiplier", m_LightMultiplier, 0.0f, 5.0f);
+		Property("Exposure", m_Exposure, 0.0f, 5.0f);
+
+		//Property("Mesh Scale", m_MeshScale, 0.0f, 2.0f);
+
+		//Property("Radiance Prefiltering", m_RadiancePrefilter);
+		//Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f);
+
+		ImGui::Columns(1);
+
+		ImGui::End();
 
 		ImGui::Separator();
 		{
@@ -212,6 +349,7 @@ public:
 			}
 		}
 		ImGui::Separator();
+
 		// Textures ------------------------------------------------------------------------------
 		{
 			// Albedo
@@ -344,7 +482,66 @@ public:
 		}
 
 		ImGui::Separator();
+
+		if (ImGui::TreeNode("Shaders"))
+		{
+			auto& shaders = Halo::Shader::s_AllShaders;
+			for (auto& shader : shaders)
+			{
+				if (ImGui::TreeNode(shader->GetName().c_str()))
+				{
+					std::string buttonName = "Reload##" + shader->GetName();
+					if (ImGui::Button(buttonName.c_str()))
+						shader->Reload();
+					ImGui::TreePop();
+				}
+			}
+			ImGui::TreePop();
+		}
+
 		ImGui::End();
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		ImGui::Begin("Viewport");
+		auto viewportSize = ImGui::GetContentRegionAvail();
+		m_Framebuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+		m_FinalPresentBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+		m_Camera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), viewportSize.x, viewportSize.y, 0.1f, 10000.0f));
+		ImGui::Image((void*)m_Framebuffer->GetColorAttachmentRendererID(), viewportSize, { 0, 1 }, { 1, 0 });
+		ImGui::End();
+		ImGui::PopStyleVar();
+
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Docking"))
+			{
+				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
+				// which we can't undo at the moment without finer window depth/z control.
+				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+
+				if (ImGui::MenuItem("Flag: NoSplit", "", (opt_flags & ImGuiDockNodeFlags_NoSplit) != 0))                 opt_flags ^= ImGuiDockNodeFlags_NoSplit;
+				if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (opt_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0))  opt_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode;
+				if (ImGui::MenuItem("Flag: NoResize", "", (opt_flags & ImGuiDockNodeFlags_NoResize) != 0))                opt_flags ^= ImGuiDockNodeFlags_NoResize;
+				//if (ImGui::MenuItem("Flag: PassthruDockspace", "", (opt_flags & ImGuiDockNodeFlags_PassthruDockspace) != 0))       opt_flags ^= ImGuiDockNodeFlags_PassthruDockspace;
+				if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (opt_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))          opt_flags ^= ImGuiDockNodeFlags_AutoHideTabBar;
+				ImGui::Separator();
+				if (ImGui::MenuItem("Close DockSpace", NULL, false, p_open != NULL))
+					p_open = false;
+				ImGui::EndMenu();
+			}
+			ImGuiShowHelpMarker(
+				"You can _always_ dock _any_ window into another by holding the SHIFT key while moving a window. Try it now!" "\n"
+				"This demo app has nothing to do with it!" "\n\n"
+				"This demo app only demonstrate the use of ImGui::DockSpace() which allows you to manually create a docking node _within_ another window. This is useful so you can decorate your main application window (e.g. with a menu bar)." "\n\n"
+				"ImGui::DockSpace() comes with one hard constraint: it needs to be submitted _before_ any window which may be docked into it. Therefore, if you use a dock spot as the central point of your application, you'll probably want it to be part of the very first window you are submitting to imgui every frame." "\n\n"
+				"(NB: because of this constraint, the implicit \"Debug\" window can not be docked into an explicit DockSpace() node, because that window is submitted as part of the NewFrame() call. An easy workaround is that you can create your own implicit \"Debug##2\" window after calling DockSpace() and leave it in the window stack for anyone to use.)"
+			);
+
+			ImGui::EndMenuBar();
+		}
+
+		ImGui::End();
+
 
 	}
 
@@ -363,16 +560,20 @@ private:
 	Halo::SharedPtr<Halo::Shader> m_Shader;
 	Halo::SharedPtr<Halo::Shader> m_LightShader;
 	Halo::SharedPtr<Halo::Shader> m_PBRShader;
-	Halo::SharedPtr<Halo::VertexArray> m_VertexArray;
-	Halo::SharedPtr<Halo::Texture2D> m_Texture;
+	Halo::SharedPtr<Halo::Shader> m_HDRShader;
+	Halo::SharedPtr<Halo::Shader> m_SkyboxShader;
 
+	Halo::SharedPtr<Halo::VertexArray> m_VertexArray;
+	Halo::SharedPtr<Halo::VertexArray> m_FullscreenQuadVertexArray;
+
+	Halo::SharedPtr<Halo::Texture2D> m_Texture;
 	Halo::SharedPtr<Halo::TextureCube> m_CubeMap;
 	Halo::SharedPtr<Halo::TextureCube> m_IrradianceMap;
-	Halo::SharedPtr<Halo::Shader> m_SkyboxShader;
-	Halo::SharedPtr<Halo::VertexArray> m_FullscreenQuadVertexArray;
 	Halo::SharedPtr<Halo::Texture2D> m_BRDFLUT;
 
 	Halo::SharedPtr<Halo::Material> m_PBRMaterial;
+
+	Halo::UniquePtr<Halo::Framebuffer> m_Framebuffer, m_FinalPresentBuffer;
 
 	struct Light
 	{
@@ -413,6 +614,8 @@ private:
 		bool UseTexture = false;
 	};
 	RoughnessInput m_RoughnessInput;
+
+	float m_Exposure = 1.0f;
 
 	Halo::Camera m_Camera;
 	// Editor resources

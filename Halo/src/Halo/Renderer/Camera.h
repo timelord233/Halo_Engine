@@ -24,6 +24,8 @@ namespace Halo {
 		inline float GetDistance() const { return m_Distance; }
 		inline void SetDistance(float distance) { m_Distance = distance; }
 
+		inline void SetProjectionMatrix(const glm::mat4& projectionMatrix) { m_ProjectionMatrix = projectionMatrix; }
+
 	private:
 		void MousePan(const glm::vec2& delta);
 		void MouseRotate(const glm::vec2& delta);

@@ -23,4 +23,5 @@
 #include "Halo/Renderer/Camera.h"
 #include "Halo/Renderer/Texture.h"
 #include "Halo/Renderer/Material.h"
+#include "Halo/Renderer/FrameBuffer.h"
 //----------------------------
